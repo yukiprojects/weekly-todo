@@ -4,7 +4,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
 <meta name="theme-color" content="#111111">
 <meta name="description" content="PLAN. — Keep your plans on track.">
 <meta name="application-name" content="PLAN.">
@@ -32,15 +31,17 @@ body {
   overflow-x:hidden;
 }
 
-.page {
-  width:100%;
-  min-height:70vh;
-}
+button,input,textarea,select { font-family:inherit; }
 
 #app {
   position:relative;
   width:100%;
   overflow:hidden;
+}
+
+.page {
+  width:100%;
+  min-height:70vh;
 }
 
 header {
@@ -108,9 +109,7 @@ h1 {
   background:#444;
 }
 
-.day-dot.active {
-  background:#75d69b;
-}
+.day-dot.active { background:#75d69b; }
 
 .section {
   color:#888;
@@ -211,6 +210,7 @@ button {
   border-radius:9px;
   padding:0 17px;
   font-weight:600;
+  cursor:pointer;
 }
 
 .task.dragging { opacity:.35; }
@@ -238,16 +238,258 @@ body.dragging {
 }
 
 /* =====================================
+   DAILY PAGE
+===================================== */
+
+#daily { display:none; }
+
+.daily-header { margin-bottom:28px; }
+
+.daily-title {
+  font-size:32px;
+  letter-spacing:3px;
+  margin:0;
+}
+
+.daily-date-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:18px;
+}
+
+.date-nav {
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.date-nav button {
+  width:34px;
+  height:34px;
+  padding:0;
+  background:#222;
+  border:1px solid #444;
+  color:#ddd;
+  font-size:17px;
+  border-radius:8px;
+}
+
+.daily-date {
+  background:#222;
+  color:white;
+  border:1px solid #444;
+  border-radius:8px;
+  padding:8px;
+  font-size:13px;
+  width:145px;
+}
+
+.today-button {
+  background:transparent;
+  color:#75d69b;
+  border:1px solid #444;
+  border-radius:7px;
+  padding:9px 10px;
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+.daily-sub {
+  color:#888;
+  font-size:11px;
+  margin-top:9px;
+}
+
+.daily-section-label {
+  color:#888;
+  font-size:11px;
+  letter-spacing:1.5px;
+  margin:32px 0 17px;
+}
+
+.daily-hint {
+  color:#666;
+  font-size:11px;
+  margin-bottom:16px;
+  line-height:1.5;
+}
+
+.timeline {
+  position:relative;
+  width:100%;
+  height:1512px;
+  margin-bottom:20px;
+}
+
+.timeline-hour {
+  position:absolute;
+  left:0;
+  right:0;
+  height:1px;
+  border-top:1px solid #333;
+}
+
+.timeline-hour-label {
+  position:absolute;
+  left:0;
+  top:-9px;
+  width:48px;
+  color:#888;
+  font-size:11px;
+  background:#111;
+  z-index:2;
+}
+
+.timeline-track {
+  position:absolute;
+  left:54px;
+  right:0;
+  top:0;
+  height:100%;
+}
+
+.timeline-events {
+  position:absolute;
+  inset:0;
+  left:54px;
+  pointer-events:none;
+}
+
+.daily-event {
+  position:absolute;
+  left:0;
+  right:0;
+  border-left:3px solid #75d69b;
+  background:#244332;
+  border-radius:6px;
+  padding:7px 9px;
+  overflow:hidden;
+  pointer-events:auto;
+  cursor:pointer;
+  z-index:3;
+}
+
+.daily-event:active { opacity:.7; }
+
+.daily-event-title {
+  color:#c8f3d7;
+  font-size:13px;
+  font-weight:600;
+  overflow-wrap:anywhere;
+}
+
+.daily-event-time {
+  color:#a2cdb1;
+  font-size:10px;
+  margin-top:4px;
+}
+
+.timeline-add {
+  position:absolute;
+  left:54px;
+  right:0;
+  height:72px;
+  cursor:pointer;
+  z-index:1;
+}
+
+.daily-bottom {
+  border-top:1px solid #333;
+  padding-top:20px;
+  margin-top:25px;
+}
+
+.daily-bottom p {
+  color:#777;
+  font-size:12px;
+  line-height:1.6;
+}
+
+/* DAILY EVENT EDITOR */
+
+.event-editor {
+  display:none;
+  background:#1b1b1b;
+  border:1px solid #444;
+  border-radius:12px;
+  padding:17px;
+  margin:20px 0 25px;
+}
+
+.editor-title {
+  font-size:16px;
+  font-weight:600;
+  margin-bottom:18px;
+}
+
+.editor-label {
+  color:#aaa;
+  font-size:11px;
+  letter-spacing:1px;
+  margin:15px 0 8px;
+}
+
+.event-input,
+.event-select {
+  width:100%;
+  background:#111;
+  border:1px solid #444;
+  border-radius:8px;
+  padding:12px;
+  color:white;
+  font-size:15px;
+  outline:none;
+}
+
+.event-input:focus,
+.event-select:focus {
+  border-color:#75d69b;
+}
+
+.time-fields {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.editor-actions {
+  display:flex;
+  gap:8px;
+  margin-top:20px;
+}
+
+.editor-actions button {
+  flex:1;
+  min-height:43px;
+}
+
+.cancel-button {
+  background:#333;
+  color:#ddd;
+}
+
+.delete-button {
+  background:transparent;
+  color:#e88b8b;
+  border:1px solid #744;
+}
+
+.event-editor-hint {
+  color:#777;
+  font-size:10px;
+  line-height:1.5;
+  margin-top:12px;
+}
+
+/* =====================================
    MONTHLY PAGE
 ===================================== */
 
-#monthly {
-  display:none;
-}
+#monthly { display:none; }
 
-.month-header {
-  margin-bottom:38px;
-}
+.month-header { margin-bottom:38px; }
 
 .month-topbar {
   display:flex;
@@ -278,11 +520,6 @@ body.dragging {
   letter-spacing:1px;
   font-weight:600;
   white-space:nowrap;
-  cursor:pointer;
-}
-
-.past-button:active {
-  opacity:.6;
 }
 
 .month-intro {
@@ -304,9 +541,7 @@ body.dragging {
   margin:0;
 }
 
-.month-section {
-  margin-bottom:30px;
-}
+.month-section { margin-bottom:30px; }
 
 .month-label {
   font-size:11px;
@@ -338,13 +573,8 @@ body.dragging {
   outline:none;
 }
 
-.month-textarea:focus {
-  border-color:#75d69b;
-}
-
-.month-textarea::placeholder {
-  color:#555;
-}
+.month-textarea:focus { border-color:#75d69b; }
+.month-textarea::placeholder { color:#555; }
 
 .month-footer {
   border-top:1px solid #333;
@@ -376,9 +606,7 @@ body.dragging {
    PAST MONTHS ARCHIVE
 ===================================== */
 
-#archive {
-  display:none;
-}
+#archive { display:none; }
 
 .archive-header {
   display:flex;
@@ -401,7 +629,6 @@ body.dragging {
   padding:9px 12px;
   font-size:10px;
   letter-spacing:1px;
-  cursor:pointer;
 }
 
 .archive-description {
@@ -425,9 +652,7 @@ body.dragging {
   color:#75d69b;
 }
 
-.history-item {
-  margin-bottom:22px;
-}
+.history-item { margin-bottom:22px; }
 
 .history-label {
   font-size:10px;
@@ -486,9 +711,7 @@ body.dragging {
   background:#444;
 }
 
-.page-indicator span.active {
-  background:#75d69b;
-}
+.page-indicator span.active { background:#75d69b; }
 
 </style>
 </head>
@@ -498,7 +721,7 @@ body.dragging {
 <div id="app">
 
 <!-- =====================================
-     PAGE 1 : WEEKLY
+     PAGE : WEEKLY (MAIN)
 ===================================== -->
 
 <div class="page" id="weekly">
@@ -534,7 +757,99 @@ body.dragging {
 
 
 <!-- =====================================
-     PAGE 2 : MONTHLY
+     PAGE : DAILY (RIGHT SWIPE)
+===================================== -->
+
+<div class="page" id="daily">
+
+  <div class="daily-header">
+    <h1 class="daily-title">DAILY.</h1>
+
+    <div class="daily-date-row">
+      <div class="date-nav">
+        <button onclick="changeDailyDate(-1)">‹</button>
+        <input
+          type="date"
+          id="dailyDate"
+          class="daily-date"
+          onchange="selectDailyDate()"
+        />
+        <button onclick="changeDailyDate(1)">›</button>
+      </div>
+
+      <button class="today-button" onclick="goToday()">TODAY</button>
+    </div>
+
+    <div class="daily-sub" id="dailyDateLabel">
+      YOUR DAY, YOUR PLAN.
+    </div>
+  </div>
+
+  <div class="daily-section-label">DAILY SCHEDULE</div>
+
+  <div class="daily-hint">
+    Tap an empty time slot to add an event. Tap an event to edit it.
+  </div>
+
+  <div class="event-editor" id="eventEditor">
+
+    <div class="editor-title" id="editorTitle">NEW EVENT</div>
+
+    <div class="editor-label">EVENT TITLE</div>
+    <input
+      id="eventName"
+      class="event-input"
+      placeholder="What are you doing?"
+      maxlength="100"
+    />
+
+    <div class="time-fields">
+
+      <div>
+        <div class="editor-label">START</div>
+        <select id="eventStart" class="event-select"></select>
+      </div>
+
+      <div>
+        <div class="editor-label">END</div>
+        <select id="eventEnd" class="event-select"></select>
+      </div>
+
+    </div>
+
+    <div class="event-editor-hint">
+      Schedule range: 05:00 – 02:00 next day.
+    </div>
+
+    <div class="editor-actions">
+      <button onclick="saveDailyEvent()">SAVE</button>
+      <button class="cancel-button" onclick="closeEventEditor()">CANCEL</button>
+      <button
+        class="delete-button"
+        id="deleteEventButton"
+        onclick="deleteDailyEvent()"
+        style="display:none;"
+      >DELETE</button>
+    </div>
+
+  </div>
+
+  <div class="timeline" id="timeline">
+    <div class="timeline-track" id="timelineTrack"></div>
+    <div class="timeline-events" id="timelineEvents"></div>
+  </div>
+
+  <div class="daily-bottom">
+    <p>
+      Plan your day, one block at a time.
+    </p>
+  </div>
+
+</div>
+
+
+<!-- =====================================
+     PAGE : MONTHLY
 ===================================== -->
 
 <div class="page" id="monthly">
@@ -566,11 +881,8 @@ body.dragging {
       <div class="month-question">
         1ヶ月後、どんな自分になっていたい？
       </div>
-      <textarea
-        class="month-textarea"
-        id="futureSelf"
-        placeholder="I want to become someone who..."
-      ></textarea>
+      <textarea class="month-textarea" id="futureSelf"
+        placeholder="I want to become someone who..."></textarea>
     </div>
 
     <div class="month-section">
@@ -578,11 +890,8 @@ body.dragging {
       <div class="month-question">
         1ヶ月後、何ができるようになっていたい？
       </div>
-      <textarea
-        class="month-textarea"
-        id="newSkills"
-        placeholder="I want to be able to..."
-      ></textarea>
+      <textarea class="month-textarea" id="newSkills"
+        placeholder="I want to be able to..."></textarea>
     </div>
 
     <div class="month-section">
@@ -590,11 +899,8 @@ body.dragging {
       <div class="month-question">
         今月、達成したいことは？
       </div>
-      <textarea
-        class="month-textarea"
-        id="monthlyGoals"
-        placeholder="My goals this month..."
-      ></textarea>
+      <textarea class="month-textarea" id="monthlyGoals"
+        placeholder="My goals this month..."></textarea>
     </div>
 
     <div class="month-section">
@@ -602,11 +908,8 @@ body.dragging {
       <div class="month-question">
         今の自分から変えたいことは？
       </div>
-      <textarea
-        class="month-textarea"
-        id="oneThing"
-        placeholder="One thing I want to change..."
-      ></textarea>
+      <textarea class="month-textarea" id="oneThing"
+        placeholder="One thing I want to change..."></textarea>
     </div>
 
     <div class="month-footer">
@@ -618,9 +921,6 @@ body.dragging {
     </div>
 
   </div>
-
-
-  <!-- PAST MONTHS ARCHIVE -->
 
   <div id="archive">
 
@@ -643,6 +943,7 @@ body.dragging {
 
 
 <div class="page-indicator">
+  <span id="dotDaily"></span>
   <span id="dotWeekly" class="active"></span>
   <span id="dotMonthly"></span>
 </div>
@@ -683,10 +984,18 @@ if ("serviceWorker" in navigator) {
 
 
 // =====================================
-// TASK DATA
+// COMMON
 // =====================================
 
-const STORAGE_KEY = "weekly-todo-data";
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g,c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[c]));
+}
 
 function dateKey(date) {
   const y = date.getFullYear();
@@ -694,6 +1003,13 @@ function dateKey(date) {
   const d = String(date.getDate()).padStart(2,"0");
   return y+"-"+m+"-"+d;
 }
+
+
+// =====================================
+// WEEKLY TASK DATA
+// =====================================
+
+const STORAGE_KEY = "weekly-todo-data";
 
 function getMonday(date) {
   const monday = new Date(date);
@@ -895,16 +1211,6 @@ function render() {
     `).join("");
 
   setupDrag();
-}
-
-function escapeHTML(s) {
-  return String(s).replace(/[&<>"']/g,c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[c]));
 }
 
 
@@ -1142,28 +1448,427 @@ function setupDrag() {
 
 
 // =====================================
+// DAILY DATA
+// =====================================
+
+const DAILY_STORAGE_KEY = "plan-daily-data";
+
+let dailyData = {};
+let selectedDailyDate = dateKey(new Date());
+let editingEventId = null;
+
+try {
+  const storedDaily = localStorage.getItem(DAILY_STORAGE_KEY);
+
+  if (storedDaily) {
+    const parsedDaily = JSON.parse(storedDaily);
+
+    if (
+      parsedDaily &&
+      typeof parsedDaily === "object" &&
+      !Array.isArray(parsedDaily)
+    ) {
+      dailyData = parsedDaily;
+    }
+  }
+} catch(e) {
+  console.error("Daily data loading error:",e);
+}
+
+function saveDailyData() {
+  try {
+    localStorage.setItem(
+      DAILY_STORAGE_KEY,
+      JSON.stringify(dailyData)
+    );
+  } catch(e) {
+    console.error("Daily save error:",e);
+    alert("Could not save daily schedule.");
+  }
+}
+
+function getDailyEvents() {
+  if (!Array.isArray(dailyData[selectedDailyDate])) {
+    dailyData[selectedDailyDate] = [];
+  }
+
+  return dailyData[selectedDailyDate];
+}
+
+
+// =====================================
+// DAILY TIME HELPERS
+// =====================================
+
+// Time is stored as minutes after 05:00.
+// 00:00 next day = 1140
+// 02:00 next day = 1260
+
+const DAILY_START = 0;
+const DAILY_END = 1260;
+const HOUR_HEIGHT = 72;
+const TOTAL_HOURS = 21;
+
+function formatDailyTime(offset) {
+
+  const total = 300 + Number(offset);
+  const hour = Math.floor(total/60)%24;
+  const minute = total%60;
+
+  return String(hour).padStart(2,"0")+":"+
+    String(minute).padStart(2,"0");
+}
+
+function formatDailyTimeLabel(offset) {
+
+  const time = formatDailyTime(offset);
+
+  if (offset>=1140) {
+    return time+" (+1 day)";
+  }
+
+  return time;
+}
+
+function buildTimeOptions() {
+
+  const startSelect = document.getElementById("eventStart");
+  const endSelect = document.getElementById("eventEnd");
+
+  let html = "";
+
+  for (let minute=DAILY_START;minute<=DAILY_END;minute+=15) {
+    html += `
+      <option value="${minute}">
+        ${escapeHTML(formatDailyTimeLabel(minute))}
+      </option>
+    `;
+  }
+
+  startSelect.innerHTML = html;
+  endSelect.innerHTML = html;
+}
+
+buildTimeOptions();
+
+
+// =====================================
+// DAILY TIMELINE
+// =====================================
+
+function renderTimeline() {
+
+  const track = document.getElementById("timelineTrack");
+  const eventsLayer = document.getElementById("timelineEvents");
+
+  let hoursHTML = "";
+
+  for (let i=0;i<=TOTAL_HOURS;i++) {
+
+    const top = i*HOUR_HEIGHT;
+    const offset = i*60;
+    const time = formatDailyTime(offset);
+
+    hoursHTML += `
+      <div class="timeline-hour" style="top:${top}px;">
+        <span class="timeline-hour-label">${time}</span>
+      </div>
+    `;
+  }
+
+  track.innerHTML = hoursHTML;
+
+  // Tap an empty hourly area to create an event.
+  let addAreasHTML = "";
+
+  for (let i=0;i<TOTAL_HOURS;i++) {
+    addAreasHTML += `
+      <div
+        class="timeline-add"
+        style="top:${i*HOUR_HEIGHT}px;"
+        onclick="openEventForm(${i*60})"
+      ></div>
+    `;
+  }
+
+  track.insertAdjacentHTML("beforeend",addAreasHTML);
+
+  const events = getDailyEvents()
+    .slice()
+    .sort((a,b) => Number(a.start)-Number(b.start));
+
+  eventsLayer.innerHTML = events.map(event => {
+
+    const start = Number(event.start);
+    const end = Number(event.end);
+
+    const top = start/60*HOUR_HEIGHT;
+    const height = Math.max(
+      30,
+      (end-start)/60*HOUR_HEIGHT
+    );
+
+    return `
+      <div
+        class="daily-event"
+        style="top:${top}px;height:${height}px;"
+        onclick="editDailyEvent(${Number(event.id)})"
+      >
+        <div class="daily-event-title">
+          ${escapeHTML(event.title)}
+        </div>
+        <div class="daily-event-time">
+          ${escapeHTML(formatDailyTime(start))} –
+          ${escapeHTML(formatDailyTime(end))}
+        </div>
+      </div>
+    `;
+
+  }).join("");
+
+  document.getElementById("timeline").style.height =
+    (TOTAL_HOURS*HOUR_HEIGHT)+"px";
+}
+
+
+// =====================================
+// DAILY DATE NAVIGATION
+// =====================================
+
+function updateDailyDateLabel() {
+
+  const date = new Date(selectedDailyDate+"T12:00:00");
+
+  document.getElementById("dailyDate").value =
+    selectedDailyDate;
+
+  document.getElementById("dailyDateLabel").textContent =
+    date.toLocaleDateString("en-US",{
+      weekday:"long",
+      month:"long",
+      day:"numeric",
+      year:"numeric"
+    }).toUpperCase()+"  ·  YOUR DAY, YOUR PLAN.";
+}
+
+function renderDaily() {
+  updateDailyDateLabel();
+  renderTimeline();
+}
+
+function changeDailyDate(amount) {
+
+  const date = new Date(selectedDailyDate+"T12:00:00");
+
+  date.setDate(date.getDate()+amount);
+
+  selectedDailyDate = dateKey(date);
+
+  closeEventEditor();
+  renderDaily();
+}
+
+function selectDailyDate() {
+
+  const value = document.getElementById("dailyDate").value;
+
+  if (!value) return;
+
+  selectedDailyDate = value;
+
+  closeEventEditor();
+  renderDaily();
+}
+
+function goToday() {
+  selectedDailyDate = dateKey(new Date());
+  closeEventEditor();
+  renderDaily();
+}
+
+
+// =====================================
+// DAILY EVENT EDITOR
+// =====================================
+
+function openEventForm(startOffset) {
+
+  editingEventId = null;
+
+  document.getElementById("editorTitle").textContent = "NEW EVENT";
+  document.getElementById("eventName").value = "";
+
+  const start = Math.max(
+    DAILY_START,
+    Math.min(DAILY_END-15,Math.round(startOffset/15)*15)
+  );
+
+  document.getElementById("eventStart").value = String(start);
+  document.getElementById("eventEnd").value = String(
+    Math.min(DAILY_END,start+60)
+  );
+
+  document.getElementById("deleteEventButton").style.display = "none";
+  document.getElementById("eventEditor").style.display = "block";
+
+  document.getElementById("eventEditor").scrollIntoView({
+    behavior:"smooth",
+    block:"nearest"
+  });
+
+  setTimeout(() => {
+    document.getElementById("eventName").focus();
+  },250);
+}
+
+function editDailyEvent(id) {
+
+  const event = getDailyEvents().find(e => Number(e.id)===Number(id));
+
+  if (!event) return;
+
+  editingEventId = Number(id);
+
+  document.getElementById("editorTitle").textContent = "EDIT EVENT";
+  document.getElementById("eventName").value = event.title;
+  document.getElementById("eventStart").value = String(event.start);
+  document.getElementById("eventEnd").value = String(event.end);
+
+  document.getElementById("deleteEventButton").style.display = "block";
+  document.getElementById("eventEditor").style.display = "block";
+
+  document.getElementById("eventEditor").scrollIntoView({
+    behavior:"smooth",
+    block:"nearest"
+  });
+}
+
+function closeEventEditor() {
+  document.getElementById("eventEditor").style.display = "none";
+  editingEventId = null;
+}
+
+function saveDailyEvent() {
+
+  const title = document.getElementById("eventName").value.trim();
+
+  const start = Number(document.getElementById("eventStart").value);
+  const end = Number(document.getElementById("eventEnd").value);
+
+  if (!title) {
+    alert("Please enter an event title.");
+    document.getElementById("eventName").focus();
+    return;
+  }
+
+  if (
+    !Number.isFinite(start) ||
+    !Number.isFinite(end) ||
+    start<DAILY_START ||
+    end>DAILY_END ||
+    end<=start
+  ) {
+    alert("Please select a valid start and end time.");
+    return;
+  }
+
+  const events = getDailyEvents();
+
+  // Prevent overlapping events.
+  const conflict = events.find(event => {
+
+    if (
+      editingEventId!==null &&
+      Number(event.id)===Number(editingEventId)
+    ) {
+      return false;
+    }
+
+    return start<Number(event.end) && end>Number(event.start);
+  });
+
+  if (conflict) {
+    alert("This time overlaps with another event.");
+    return;
+  }
+
+  if (editingEventId!==null) {
+
+    const index = events.findIndex(
+      e => Number(e.id)===Number(editingEventId)
+    );
+
+    if (index!==-1) {
+      events[index] = {
+        ...events[index],
+        title:title,
+        start:start,
+        end:end
+      };
+    }
+
+  } else {
+
+    events.push({
+      id:Date.now(),
+      title:title,
+      start:start,
+      end:end
+    });
+
+  }
+
+  saveDailyData();
+  closeEventEditor();
+  renderTimeline();
+}
+
+function deleteDailyEvent() {
+
+  if (editingEventId===null) return;
+
+  if (!confirm("Delete this event?")) return;
+
+  dailyData[selectedDailyDate] = getDailyEvents().filter(
+    event => Number(event.id)!==Number(editingEventId)
+  );
+
+  saveDailyData();
+  closeEventEditor();
+  renderTimeline();
+}
+
+
+// =====================================
+// DAILY ENTER HANDLING
+// =====================================
+
+document.getElementById("eventName").addEventListener(
+  "keydown",
+  event => {
+
+    if (event.key!=="Enter") return;
+
+    if (event.isComposing || event.keyCode===229) return;
+
+    event.preventDefault();
+    saveDailyEvent();
+
+  }
+);
+
+
+// =====================================
 // MONTHLY DATA
 // =====================================
 
 const MONTHLY_STORAGE_KEY = "plan-monthly-data";
 
 const MONTHLY_FIELDS = [
-  {
-    key:"futureSelf",
-    label:"MY FUTURE SELF"
-  },
-  {
-    key:"newSkills",
-    label:"NEW SKILLS"
-  },
-  {
-    key:"monthlyGoals",
-    label:"MY GOALS"
-  },
-  {
-    key:"oneThing",
-    label:"ONE THING TO CHANGE"
-  }
+  {key:"futureSelf",label:"MY FUTURE SELF"},
+  {key:"newSkills",label:"NEW SKILLS"},
+  {key:"monthlyGoals",label:"MY GOALS"},
+  {key:"oneThing",label:"ONE THING TO CHANGE"}
 ];
 
 function getMonthKey(date) {
@@ -1179,7 +1884,6 @@ function getMonthName(date) {
 }
 
 let currentMonthKey = getMonthKey(new Date());
-
 let monthlyData = {};
 
 try {
@@ -1258,11 +1962,7 @@ function loadMonthly() {
 }
 
 document.querySelectorAll(".month-textarea").forEach(textarea => {
-
-  textarea.addEventListener("input",() => {
-    saveMonthly();
-  });
-
+  textarea.addEventListener("input",saveMonthly);
 });
 
 loadMonthly();
@@ -1276,7 +1976,7 @@ function formatArchiveMonth(monthKey) {
 
   const parts = monthKey.split("-");
 
-  if (parts.length !== 2) return monthKey;
+  if (parts.length!==2) return monthKey;
 
   const year = Number(parts[0]);
   const month = Number(parts[1]);
@@ -1284,43 +1984,38 @@ function formatArchiveMonth(monthKey) {
   if (
     !Number.isInteger(year) ||
     !Number.isInteger(month) ||
-    month < 1 ||
-    month > 12
+    month<1 ||
+    month>12
   ) {
     return monthKey;
   }
 
-  const date = new Date(year,month-1,1);
-
-  return getMonthName(date);
+  return getMonthName(new Date(year,month-1,1));
 }
 
 function hasRecordedContent(data) {
 
-  if (!data || typeof data !== "object") return false;
+  if (!data || typeof data!=="object") return false;
 
   return MONTHLY_FIELDS.some(field => {
-    return String(data[field.key] || "").trim() !== "";
+    return String(data[field.key] || "").trim()!=="";
   });
 }
 
 function renderArchive() {
 
   const historyList = document.getElementById("historyList");
-
   const nowMonthKey = getMonthKey(new Date());
 
   const pastMonths = Object.keys(monthlyData)
-    .filter(key => {
-      return (
-        /^\d{4}-\d{2}$/.test(key) &&
-        key < nowMonthKey &&
-        hasRecordedContent(monthlyData[key])
-      );
-    })
+    .filter(key => (
+      /^\d{4}-\d{2}$/.test(key) &&
+      key<nowMonthKey &&
+      hasRecordedContent(monthlyData[key])
+    ))
     .sort((a,b) => b.localeCompare(a));
 
-  if (pastMonths.length === 0) {
+  if (pastMonths.length===0) {
 
     historyList.innerHTML = `
       <div class="archive-empty">
@@ -1347,9 +2042,7 @@ function renderArchive() {
 
       return `
         <div class="history-item">
-          <div class="history-label">
-            ${field.label}
-          </div>
+          <div class="history-label">${field.label}</div>
           <div class="history-value ${value ? "" : "empty"}">${value ? escapeHTML(value) : "Not recorded"}</div>
         </div>
       `;
@@ -1370,9 +2063,7 @@ function renderArchive() {
 
 function showArchive() {
 
-  // Save the latest values before opening the archive.
   saveMonthly();
-
   renderArchive();
 
   document.getElementById("monthlyMain").style.display = "none";
@@ -1389,42 +2080,59 @@ function closeArchive() {
   window.scrollTo(0,0);
 }
 
+function closeArchiveIfOpen() {
+  document.getElementById("archive").style.display = "none";
+  document.getElementById("monthlyMain").style.display = "block";
+}
+
 
 // =====================================
-// SWIPE PAGE NAVIGATION
+// PAGE NAVIGATION
 // =====================================
+
+// WEEKLY is the main page.
+// Swipe right from WEEKLY -> DAILY.
+// Swipe left from WEEKLY -> MONTHLY.
 
 let currentPage = "weekly";
 
 const weeklyPage = document.getElementById("weekly");
+const dailyPage = document.getElementById("daily");
 const monthlyPage = document.getElementById("monthly");
 
 function showPage(page) {
 
   if (page===currentPage) return;
 
-  // Close archive before leaving MONTHLY.
-  if (page==="weekly") {
+  if (page!=="monthly") {
     closeArchiveIfOpen();
+  }
+
+  if (page==="monthly") {
+    saveMonthly();
   }
 
   currentPage = page;
 
-  if (page==="monthly") {
+  weeklyPage.style.display = page==="weekly" ? "block" : "none";
+  dailyPage.style.display = page==="daily" ? "block" : "none";
+  monthlyPage.style.display = page==="monthly" ? "block" : "none";
 
-    weeklyPage.style.display = "none";
-    monthlyPage.style.display = "block";
-
-    loadMonthly();
-
-  } else {
-
-    monthlyPage.style.display = "none";
-    weeklyPage.style.display = "block";
-
-    checkWeekChange();
-
+  if (page==="daily") {
+    renderDaily();
   }
+
+  if (page==="monthly") {
+    loadMonthly();
+  }
+
+  if (page==="weekly") {
+    checkWeekChange();
+  }
+
+  document.getElementById("dotDaily").classList.toggle(
+    "active",page==="daily"
+  );
 
   document.getElementById("dotWeekly").classList.toggle(
     "active",page==="weekly"
@@ -1437,14 +2145,10 @@ function showPage(page) {
   window.scrollTo(0,0);
 }
 
-function closeArchiveIfOpen() {
 
-  document.getElementById("archive").style.display = "none";
-  document.getElementById("monthlyMain").style.display = "block";
-}
-
-
-// Swipe detection
+// =====================================
+// SWIPE DETECTION
+// =====================================
 
 let swipeStartX = 0;
 let swipeStartY = 0;
@@ -1464,8 +2168,12 @@ document.addEventListener("touchstart",e => {
     target.closest("textarea") ||
     target.closest("input") ||
     target.closest("button") ||
+    target.closest("select") ||
     target.closest(".task") ||
-    target.closest(".add-area")
+    target.closest(".add-area") ||
+    target.closest(".event-editor") ||
+    target.closest(".daily-event") ||
+    target.closest(".timeline-add")
   );
 
   swipeStartX = e.touches[0].clientX;
@@ -1483,9 +2191,8 @@ document.addEventListener("touchend",e => {
 
   if (swipeBlocked) return;
 
-  // Do not navigate while the archive is open.
   if (
-    document.getElementById("archive").style.display === "block"
+    document.getElementById("archive").style.display==="block"
   ) return;
 
   const touch = e.changedTouches[0];
@@ -1493,18 +2200,22 @@ document.addEventListener("touchend",e => {
   const diffX = touch.clientX-swipeStartX;
   const diffY = touch.clientY-swipeStartY;
 
-  // Vertical movement should not change pages.
   if (Math.abs(diffY)>Math.abs(diffX)) return;
-
-  // Ignore short movements.
   if (Math.abs(diffX)<65) return;
 
-  if (diffX<0 && currentPage==="weekly") {
-    showPage("monthly");
-  }
+  if (currentPage==="weekly") {
 
-  if (diffX>0 && currentPage==="monthly") {
-    showPage("weekly");
+    if (diffX<0) showPage("monthly");
+    if (diffX>0) showPage("daily");
+
+  } else if (currentPage==="monthly") {
+
+    if (diffX>0) showPage("weekly");
+
+  } else if (currentPage==="daily") {
+
+    if (diffX<0) showPage("weekly");
+
   }
 
 },{passive:true});
@@ -1515,6 +2226,7 @@ document.addEventListener("touchend",e => {
 // =====================================
 
 render();
+renderDaily();
 
 </script>
 
