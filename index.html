@@ -274,6 +274,7 @@ body.dragging {
   color:#ddd;
   font-size:17px;
   border-radius:8px;
+  flex-shrink:0;
 }
 
 .daily-date {
@@ -294,6 +295,7 @@ body.dragging {
   padding:9px 10px;
   font-size:10px;
   letter-spacing:1px;
+  white-space:nowrap;
 }
 
 .daily-sub {
@@ -325,7 +327,7 @@ body.dragging {
 
 .timeline-hour {
   position:absolute;
-  left:0;
+  left:54px;
   right:0;
   height:1px;
   border-top:1px solid #333;
@@ -333,7 +335,7 @@ body.dragging {
 
 .timeline-hour-label {
   position:absolute;
-  left:0;
+  left:-54px;
   top:-9px;
   width:48px;
   color:#888;
@@ -344,7 +346,7 @@ body.dragging {
 
 .timeline-track {
   position:absolute;
-  left:54px;
+  left:0;
   right:0;
   top:0;
   height:100%;
@@ -463,6 +465,8 @@ body.dragging {
 .editor-actions button {
   flex:1;
   min-height:43px;
+  padding:0 8px;
+  font-size:11px;
 }
 
 .cancel-button {
@@ -757,7 +761,7 @@ body.dragging {
 
 
 <!-- =====================================
-     PAGE : DAILY (RIGHT SWIPE)
+     PAGE : DAILY
 ===================================== -->
 
 <div class="page" id="daily">
@@ -804,7 +808,6 @@ body.dragging {
     />
 
     <div class="time-fields">
-
       <div>
         <div class="editor-label">START</div>
         <select id="eventStart" class="event-select"></select>
@@ -814,7 +817,6 @@ body.dragging {
         <div class="editor-label">END</div>
         <select id="eventEnd" class="event-select"></select>
       </div>
-
     </div>
 
     <div class="event-editor-hint">
@@ -840,9 +842,7 @@ body.dragging {
   </div>
 
   <div class="daily-bottom">
-    <p>
-      Plan your day, one block at a time.
-    </p>
+    <p>Plan your day, one block at a time.</p>
   </div>
 
 </div>
@@ -857,7 +857,6 @@ body.dragging {
   <div id="monthlyMain">
 
     <div class="month-header">
-
       <div class="month-topbar">
         <h1 class="month-title">MONTHLY.</h1>
         <button class="past-button" onclick="showArchive()">
@@ -866,7 +865,6 @@ body.dragging {
       </div>
 
       <div class="month-period" id="monthPeriod"></div>
-
     </div>
 
     <div class="month-intro">
@@ -2172,8 +2170,7 @@ document.addEventListener("touchstart",e => {
     target.closest(".task") ||
     target.closest(".add-area") ||
     target.closest(".event-editor") ||
-    target.closest(".daily-event") ||
-    target.closest(".timeline-add")
+    target.closest(".daily-event")
   );
 
   swipeStartX = e.touches[0].clientX;
