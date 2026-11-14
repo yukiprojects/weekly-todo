@@ -1,0 +1,490 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Weekly ToDo</title>
+
+<style>
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  padding:38px 24px;
+  padding-top:calc(38px + env(safe-area-inset-top));
+  padding-bottom:calc(38px + env(safe-area-inset-bottom));
+  background:#111;
+  color:white;
+  font-family:-apple-system,sans-serif;
+}
+
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+h1 {
+  font-size:32px;
+  letter-spacing:3px;
+  margin:0;
+}
+
+.sub {
+  color:#888;
+  font-size:11px;
+  margin-top:6px;
+}
+
+.progress {
+  color:#75d69b;
+  font-size:12px;
+}
+
+.weekdays {
+  display:flex;
+  justify-content:space-between;
+  margin-top:30px;
+  padding:0 5px;
+}
+
+.day {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:9px;
+  color:#777;
+  font-size:10px;
+}
+
+.day-date {
+  color:white;
+  font-size:13px;
+  font-weight:600;
+}
+
+.day-dot {
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:#444;
+}
+
+.day-dot.active {
+  background:#75d69b;
+}
+
+.section {
+  color:#888;
+  font-size:11px;
+  letter-spacing:1.5px;
+  margin:38px 0 22px;
+}
+
+.task {
+  display:flex;
+  align-items:center;
+  gap:13px;
+  margin-bottom:23px;
+  font-size:15px;
+  position:relative;
+  transition:opacity .12s;
+  touch-action:pan-y;
+}
+
+.circle {
+  width:20px;
+  height:20px;
+  border:1px solid #777;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.done .circle {
+  background:#75d69b;
+  border-color:#75d69b;
+}
+
+.done .task-name {
+  opacity:.4;
+  text-decoration:line-through;
+}
+
+.task-name {
+  flex:1;
+}
+
+.remove {
+  color:#777;
+  font-size:22px;
+  padding:0 5px;
+  cursor:pointer;
+}
+
+.add-area {
+  display:flex;
+  gap:8px;
+  margin-top:30px;
+}
+
+input {
+  min-width:0;
+  flex:1;
+  background:#222;
+  border:1px solid #444;
+  border-radius:9px;
+  padding:13px;
+  color:white;
+  font-size:16px;
+  -webkit-appearance:none;
+}
+
+button {
+  background:#75d69b;
+  color:#111;
+  border:0;
+  border-radius:9px;
+  padding:0 17px;
+  font-weight:600;
+}
+
+.task.dragging {
+  opacity:.35;
+}
+
+.task.drag-target {
+  padding-bottom:0;
+  border-bottom:0;
+}
+
+.task.drag-target::after {
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:100%;
+  height:2px;
+  background:#75d69b;
+  transform:translateY(10px);
+  pointer-events:none;
+}
+
+body.dragging {
+  user-select:none;
+  -webkit-user-select:none;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div>
+    <h1>WEEKLY</h1>
+    <div class="sub" id="period"></div>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<div class="weekdays" id="weekdays"></div>
+
+<div class="section">TO DO LIST</div>
+<div id="list"></div>
+
+<div class="add-area">
+  <input id="newTask" placeholder="New task..." />
+  <button onclick="addTask()">＋</button>
+</div>
+
+<script>
+const STORAGE_KEY = "weekly-todo-data";
+
+function dateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth()+1).padStart(2,"0");
+  const d = String(date.getDate()).padStart(2,"0");
+  return y + "-" + m + "-" + d;
+}
+
+function getMonday(date) {
+  const monday = new Date(date);
+  const day = (monday.getDay()+6)%7;
+  monday.setDate(monday.getDate()-day);
+  monday.setHours(0,0,0,0);
+  return monday;
+}
+
+const currentWeekStart = dateKey(getMonday(new Date()));
+
+let tasks = [
+  {name:"Book hotel in Kyoto", done:true},
+  {name:"Prepare tour itinerary", done:true},
+  {name:"Reply to James", done:true},
+  {name:"Research new business", done:false},
+  {name:"Update accounting", done:false},
+  {name:"Buy travel equipment", done:false},
+  {name:"Plan next week", done:false}
+];
+
+let savedWeekStart = currentWeekStart;
+
+// 保存データの読み込み
+try {
+  const stored = localStorage.getItem(STORAGE_KEY);
+
+  if (stored) {
+    const data = JSON.parse(stored);
+
+    if (Array.isArray(data)) {
+      tasks = data;
+    } else {
+      tasks = Array.isArray(data.tasks) ? data.tasks : [];
+      savedWeekStart = data.weekStart || currentWeekStart;
+    }
+  }
+} catch(e) {
+  console.error("Data loading error:", e);
+}
+
+// 新しい週になっていたら未完了タスクだけ残す
+if (savedWeekStart !== currentWeekStart) {
+  tasks = tasks.filter(t => !t.done);
+  tasks.forEach(t => delete t.completedAt);
+  savedWeekStart = currentWeekStart;
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      weekStart: currentWeekStart,
+      tasks: tasks
+    }));
+  } catch(e) {
+    console.error("Data saving error:", e);
+    alert("Could not save data.");
+  }
+}
+
+// 初回または週更新時の保存
+save();
+
+function getWeekDates() {
+  const monday = getMonday(new Date());
+
+  return Array.from({length:7},(_,i)=>{
+    const d = new Date(monday);
+    d.setDate(monday.getDate()+i);
+    return d;
+  });
+}
+
+const weekDates = getWeekDates();
+
+function formatDate(date) {
+  return date.toLocaleDateString("en-US", {
+    month:"short",
+    day:"numeric"
+  });
+}
+
+document.getElementById("period").textContent =
+  formatDate(weekDates[0]) + " — " +
+  formatDate(weekDates[6]) + ", " +
+  weekDates[6].getFullYear();
+
+function render() {
+  const done = tasks.filter(t=>t.done).length;
+
+  document.getElementById("progress").textContent =
+    done + " / " + tasks.length + " DONE";
+
+  document.getElementById("weekdays").innerHTML =
+    weekDates.map((date,i)=>{
+      const key = dateKey(date);
+      const active = tasks.some(t=>t.completedAt===key);
+
+      return `
+        <div class="day">
+          <span class="day-date">${date.getDate()}</span>
+          <span>${["MON","TUE","WED","THU","FRI","SAT","SUN"][i]}</span>
+          <div class="day-dot ${active?'active':''}"></div>
+        </div>
+      `;
+    }).join("");
+
+  document.getElementById("list").innerHTML =
+    tasks.map((t,i)=>`
+      <div class="task ${t.done?'done':''}" data-index="${i}">
+        <div class="circle" onclick="toggle(${i})"></div>
+        <span class="task-name">${escapeHTML(t.name)}</span>
+        <span class="remove" onclick="removeTask(${i})">×</span>
+      </div>
+    `).join("");
+
+  setupDrag();
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g,c=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[c]));
+}
+
+function toggle(i) {
+  tasks[i].done = !tasks[i].done;
+
+  if (tasks[i].done) {
+    tasks[i].completedAt = dateKey(new Date());
+  } else {
+    delete tasks[i].completedAt;
+  }
+
+  render();
+  save();
+}
+
+function addTask() {
+  const input = document.getElementById("newTask");
+  const name = input.value.trim();
+
+  if (!name) return;
+
+  tasks.push({name:name,done:false});
+  input.value = "";
+  render();
+  save();
+}
+
+function removeTask(i) {
+  tasks.splice(i,1);
+  render();
+  save();
+}
+
+// 長押しドラッグによる並べ替え
+let dragIndex = null;
+let dragStarted = false;
+let pressTimer = null;
+let startY = 0;
+let currentY = 0;
+
+function setupDrag() {
+  const rows = document.querySelectorAll(".task");
+
+  rows.forEach(row => {
+    row.addEventListener("touchstart", e => {
+      if (e.target.closest(".circle") ||
+          e.target.closest(".remove")) return;
+
+      const touch = e.touches[0];
+      const index = Number(row.dataset.index);
+
+      startY = touch.clientY;
+      currentY = startY;
+      dragStarted = false;
+
+      clearTimeout(pressTimer);
+
+      pressTimer = setTimeout(() => {
+        dragIndex = index;
+        dragStarted = true;
+        row.classList.add("dragging");
+        document.body.classList.add("dragging");
+      }, 300);
+
+    }, {passive:true});
+
+    row.addEventListener("touchmove", e => {
+      const touch = e.touches[0];
+      currentY = touch.clientY;
+
+      if (!dragStarted) {
+        if (Math.abs(currentY-startY)>10) {
+          clearTimeout(pressTimer);
+        }
+        return;
+      }
+
+      e.preventDefault();
+
+      const target = document.elementFromPoint(
+        touch.clientX,
+        touch.clientY
+      );
+
+      const targetRow = target
+        ? target.closest(".task")
+        : null;
+
+      document.querySelectorAll(".task").forEach(r => {
+        r.classList.remove("drag-target");
+      });
+
+      if (targetRow) {
+        const targetIndex = Number(targetRow.dataset.index);
+
+        if (targetIndex !== dragIndex) {
+          targetRow.classList.add("drag-target");
+        }
+      }
+
+    }, {passive:false});
+
+    row.addEventListener("touchend", e => {
+      clearTimeout(pressTimer);
+
+      if (!dragStarted) return;
+
+      const touch = e.changedTouches[0];
+
+      const target = document.elementFromPoint(
+        touch.clientX,
+        touch.clientY
+      );
+
+      const targetRow = target
+        ? target.closest(".task")
+        : null;
+
+      if (targetRow) {
+        const targetIndex = Number(targetRow.dataset.index);
+
+        if (targetIndex !== dragIndex) {
+          const moved = tasks.splice(dragIndex,1)[0];
+          tasks.splice(targetIndex,0,moved);
+          save();
+        }
+      }
+
+      dragIndex = null;
+      dragStarted = false;
+      document.body.classList.remove("dragging");
+
+      render();
+
+    }, {passive:true});
+
+    row.addEventListener("touchcancel", () => {
+      clearTimeout(pressTimer);
+
+      if (dragStarted) {
+        dragIndex = null;
+        dragStarted = false;
+        document.body.classList.remove("dragging");
+        render();
+      }
+    });
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
