@@ -297,6 +297,16 @@ if (savedWeekStart !== currentWeekStart) {
   savedWeekStart = currentWeekStart;
 }
 
+// 読み込み時点で未完了・完了の順番に統一
+sortTasks();
+
+function sortTasks() {
+  tasks = [
+    ...tasks.filter(t => !t.done),
+    ...tasks.filter(t => t.done)
+  ];
+}
+
 function save() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -336,17 +346,8 @@ document.getElementById("period").textContent =
   formatDate(weekDates[6]) + ", " +
   weekDates[6].getFullYear();
 
-// 未完了を上、完了を下に表示
-function getSortedTasks() {
-  return [
-    ...tasks.filter(t => !t.done),
-    ...tasks.filter(t => t.done)
-  ];
-}
-
 function render() {
   const done = tasks.filter(t=>t.done).length;
-  const sortedTasks = getSortedTasks();
 
   document.getElementById("progress").textContent =
     done + " / " + tasks.length + " DONE";
@@ -382,7 +383,7 @@ function render() {
           </div>
         </div>
       `
-      : sortedTasks.map((t,i)=>`
+      : tasks.map((t,i)=>`
         <div class="task ${t.done?'done':''}" data-index="${i}">
           <div class="circle" onclick="toggle(${i})"></div>
           <span class="task-name">${escapeHTML(t.name)}</span>
@@ -403,10 +404,9 @@ function escapeHTML(s) {
   }[c]));
 }
 
-// チェックを切り替えたタスクを移動先グループの最後に配置
+// チェック切り替え
 function toggle(i) {
-  const sortedTasks = getSortedTasks();
-  const task = sortedTasks[i];
+  const task = tasks[i];
 
   if (!task) return;
 
@@ -418,61 +418,44 @@ function toggle(i) {
     delete task.completedAt;
   }
 
-  const remaining = tasks.filter(t => t !== task);
-
-  // 元の配列から一度取り除き、移動先グループの最後に追加
-  tasks = remaining;
-
-  if (task.done) {
-    const lastUndoneIndex = tasks.findIndex(t => t.done);
-
-    if (lastUndoneIndex === -1) {
-      tasks.push(task);
-    } else {
-      tasks.splice(lastUndoneIndex, 0, task);
-    }
-  } else {
-    const lastUndoneIndex = tasks.reduce(
-      (last, t, index) => !t.done ? index : last,
-      -1
-    );
-
-    tasks.splice(lastUndoneIndex + 1, 0, task);
-  }
+  // 未完了を上、完了を下に再配置
+  sortTasks();
 
   render();
   save();
 }
 
+// タスク追加
 function addTask() {
   const input = document.getElementById("newTask");
   const name = input.value.trim();
 
   if (!name) return;
 
-  // 新しいタスクは未完了グループの最後に追加
-  const lastUndoneIndex = tasks.reduce(
-    (last, t, index) => !t.done ? index : last,
-    -1
-  );
-
-  tasks.splice(lastUndoneIndex + 1, 0, {
+  const task = {
     name:name,
     done:false
-  });
+  };
+
+  // 未完了グループの最後に追加
+  const firstDone = tasks.findIndex(t => t.done);
+
+  if (firstDone === -1) {
+    tasks.push(task);
+  } else {
+    tasks.splice(firstDone, 0, task);
+  }
 
   input.value = "";
   render();
   save();
 }
 
+// タスク削除
 function removeTask(i) {
-  const sortedTasks = getSortedTasks();
-  const task = sortedTasks[i];
+  if (i < 0 || i >= tasks.length) return;
 
-  if (!task) return;
-
-  tasks = tasks.filter(t => t !== task);
+  tasks.splice(i,1);
   render();
   save();
 }
@@ -482,7 +465,6 @@ let dragIndex = null;
 let dragStarted = false;
 let pressTimer = null;
 let startY = 0;
-let currentY = 0;
 
 function setupDrag() {
   const rows = document.querySelectorAll(".task");
@@ -493,16 +475,14 @@ function setupDrag() {
           e.target.closest(".remove")) return;
 
       const touch = e.touches[0];
-      const index = Number(row.dataset.index);
 
+      dragIndex = Number(row.dataset.index);
       startY = touch.clientY;
-      currentY = startY;
       dragStarted = false;
 
       clearTimeout(pressTimer);
 
       pressTimer = setTimeout(() => {
-        dragIndex = index;
         dragStarted = true;
         row.classList.add("dragging");
         document.body.classList.add("dragging");
@@ -512,10 +492,9 @@ function setupDrag() {
 
     row.addEventListener("touchmove", e => {
       const touch = e.touches[0];
-      currentY = touch.clientY;
 
       if (!dragStarted) {
-        if (Math.abs(currentY-startY)>10) {
+        if (Math.abs(touch.clientY-startY)>10) {
           clearTimeout(pressTimer);
         }
         return;
@@ -549,7 +528,10 @@ function setupDrag() {
     row.addEventListener("touchend", e => {
       clearTimeout(pressTimer);
 
-      if (!dragStarted) return;
+      if (!dragStarted) {
+        dragIndex = null;
+        return;
+      }
 
       const touch = e.changedTouches[0];
 
@@ -565,32 +547,23 @@ function setupDrag() {
       if (targetRow) {
         const targetIndex = Number(targetRow.dataset.index);
 
-        if (targetIndex !== dragIndex) {
-          const moved = sortedTaskAt(dragIndex);
-          const target = sortedTaskAt(targetIndex);
+        if (
+          targetIndex !== dragIndex &&
+          tasks[dragIndex] &&
+          tasks[targetIndex] &&
+          tasks[dragIndex].done === tasks[targetIndex].done
+        ) {
+          const moved = tasks.splice(dragIndex,1)[0];
 
-          if (moved && target && moved.done === target.done) {
-            const group = tasks.filter(t => t.done === moved.done);
-            const from = group.indexOf(moved);
-            const to = group.indexOf(target);
+          // 削除後の位置を補正
+          const insertIndex = targetIndex > dragIndex
+            ? targetIndex
+            : targetIndex;
 
-            group.splice(from, 1);
-            group.splice(to, 0, moved);
+          tasks.splice(insertIndex,0,moved);
 
-            tasks = [
-              ...tasks.filter(t => !t.done),
-              ...tasks.filter(t => t.done)
-            ];
-
-            const reorderedGroup = group;
-            const otherGroup = tasks.filter(t => t.done !== moved.done);
-
-            tasks = moved.done
-              ? [...otherGroup, ...reorderedGroup]
-              : [...reorderedGroup, ...otherGroup];
-
-            save();
-          }
+          sortTasks();
+          save();
         }
       }
 
@@ -613,10 +586,6 @@ function setupDrag() {
       }
     });
   });
-}
-
-function sortedTaskAt(index) {
-  return getSortedTasks()[index];
 }
 
 render();
