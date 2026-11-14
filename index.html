@@ -245,7 +245,11 @@ body.dragging {
 <div id="list"></div>
 
 <div class="add-area">
-  <input id="newTask" placeholder="New task..." />
+  <input
+    id="newTask"
+    placeholder="New task..."
+    enterkeyhint="done"
+  />
   <button onclick="addTask()">＋</button>
 </div>
 
@@ -255,8 +259,7 @@ body.dragging {
 // APP VERSION
 // =====================================
 
-// 新しいコードを公開するときは、この番号を変更する
-const APP_VERSION = "2026-11-14-2";
+const APP_VERSION = "2026-11-14-3";
 
 
 // =====================================
@@ -267,7 +270,6 @@ async function checkForUpdates() {
   try {
     const checkURL = new URL(location.pathname, location.origin);
 
-    // キャッシュを避けて最新HTMLを取得
     checkURL.searchParams.set("_update_check", Date.now());
 
     const response = await fetch(checkURL.toString(), {
@@ -278,7 +280,6 @@ async function checkForUpdates() {
 
     const html = await response.text();
 
-    // 最新HTML内のバージョン番号を取得
     const match = html.match(
       /const APP_VERSION = ["']([^"']+)["'];/
     );
@@ -287,7 +288,6 @@ async function checkForUpdates() {
 
     const latestVersion = match[1];
 
-    // バージョンが違う場合だけ更新
     if (latestVersion !== APP_VERSION) {
 
       const updateURL = new URL(location.href);
@@ -299,7 +299,6 @@ async function checkForUpdates() {
     }
 
   } catch (error) {
-    // 更新確認に失敗しても通常利用は継続
     console.log("Update check skipped:", error);
   }
 }
@@ -532,6 +531,42 @@ function addTask() {
   render();
   save();
 }
+
+
+// =====================================
+// JAPANESE IME ENTER HANDLING
+// =====================================
+
+const taskInput = document.getElementById("newTask");
+
+let isTaskInputComposing = false;
+
+taskInput.addEventListener("compositionstart", () => {
+  isTaskInputComposing = true;
+});
+
+taskInput.addEventListener("compositionend", () => {
+  isTaskInputComposing = false;
+});
+
+taskInput.addEventListener("keydown", event => {
+
+  if (event.key !== "Enter") return;
+
+  // 日本語変換中のEnterでは追加しない
+  if (
+    isTaskInputComposing ||
+    event.isComposing ||
+    event.keyCode === 229
+  ) {
+    return;
+  }
+
+  // 変換確定後のEnterでタスク追加
+  event.preventDefault();
+  addTask();
+
+});
 
 
 // =====================================
