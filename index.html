@@ -9,17 +9,14 @@
 <meta name="description" content="PLAN. — Keep your plans on track.">
 <meta name="application-name" content="PLAN.">
 
-<!-- PWA -->
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" type="image/png" href="./icon.PNG">
-
-<!-- iPhone -->
 <link rel="apple-touch-icon" href="./icon.PNG">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="PLAN.">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<title>PLAN. — Weekly</title>
+<title>PLAN.</title>
 
 <style>
 * { box-sizing:border-box; }
@@ -32,6 +29,18 @@ body {
   background:#111;
   color:white;
   font-family:-apple-system,sans-serif;
+  overflow-x:hidden;
+}
+
+.page {
+  width:100%;
+  min-height:70vh;
+}
+
+#app {
+  position:relative;
+  width:100%;
+  overflow:hidden;
 }
 
 header {
@@ -139,9 +148,7 @@ h1 {
   text-decoration:line-through;
 }
 
-.task-name {
-  flex:1;
-}
+.task-name { flex:1; }
 
 .remove {
   color:#777;
@@ -206,9 +213,7 @@ button {
   font-weight:600;
 }
 
-.task.dragging {
-  opacity:.35;
-}
+.task.dragging { opacity:.35; }
 
 .task.drag-target {
   padding-bottom:0;
@@ -231,10 +236,151 @@ body.dragging {
   user-select:none;
   -webkit-user-select:none;
 }
+
+/* =====================================
+   MONTHLY PAGE
+===================================== */
+
+#monthly {
+  display:none;
+}
+
+.month-header {
+  margin-bottom:38px;
+}
+
+.month-title {
+  font-size:32px;
+  letter-spacing:3px;
+  margin:0;
+}
+
+.month-period {
+  color:#888;
+  font-size:11px;
+  margin-top:8px;
+}
+
+.month-intro {
+  margin-top:43px;
+  margin-bottom:35px;
+}
+
+.month-intro h2 {
+  font-size:25px;
+  line-height:1.3;
+  letter-spacing:-.5px;
+  margin:0 0 12px;
+}
+
+.month-intro p {
+  color:#888;
+  font-size:13px;
+  line-height:1.6;
+  margin:0;
+}
+
+.month-section {
+  margin-bottom:30px;
+}
+
+.month-label {
+  font-size:11px;
+  letter-spacing:1.5px;
+  color:#75d69b;
+  margin-bottom:10px;
+}
+
+.month-question {
+  color:#aaa;
+  font-size:13px;
+  margin-bottom:13px;
+  line-height:1.5;
+}
+
+.month-textarea {
+  display:block;
+  width:100%;
+  min-height:105px;
+  resize:vertical;
+  background:#1c1c1c;
+  border:1px solid #383838;
+  border-radius:10px;
+  padding:15px;
+  color:white;
+  font-family:inherit;
+  font-size:15px;
+  line-height:1.6;
+  outline:none;
+}
+
+.month-textarea:focus {
+  border-color:#75d69b;
+}
+
+.month-textarea::placeholder {
+  color:#555;
+}
+
+.month-footer {
+  border-top:1px solid #333;
+  padding-top:28px;
+  margin-top:42px;
+}
+
+.month-footer h3 {
+  font-size:19px;
+  margin:0 0 9px;
+  letter-spacing:.3px;
+}
+
+.month-footer p {
+  color:#777;
+  font-size:12px;
+  line-height:1.6;
+  margin:0;
+}
+
+.save-status {
+  color:#75d69b;
+  font-size:10px;
+  margin-top:15px;
+  text-align:right;
+}
+
+/* SWIPE INDICATOR */
+
+.page-indicator {
+  display:flex;
+  justify-content:center;
+  gap:7px;
+  margin-top:35px;
+  padding-bottom:10px;
+}
+
+.page-indicator span {
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#444;
+}
+
+.page-indicator span.active {
+  background:#75d69b;
+}
+
 </style>
 </head>
 
 <body>
+
+<div id="app">
+
+<!-- =====================================
+     PAGE 1 : WEEKLY
+===================================== -->
+
+<div class="page" id="weekly">
 
 <header>
   <div class="brand">
@@ -259,13 +405,96 @@ body.dragging {
 <div id="list"></div>
 
 <div class="add-area">
-  <input
-    id="newTask"
-    placeholder="New task..."
-    enterkeyhint="done"
-  />
+  <input id="newTask" placeholder="New task..." enterkeyhint="done"/>
   <button onclick="addTask()">＋</button>
 </div>
+
+</div>
+
+
+<!-- =====================================
+     PAGE 2 : MONTHLY
+===================================== -->
+
+<div class="page" id="monthly">
+
+  <div class="month-header">
+    <h1 class="month-title">MONTHLY.</h1>
+    <div class="month-period" id="monthPeriod"></div>
+  </div>
+
+  <div class="month-intro">
+    <h2>Who do I want to become?</h2>
+    <p>
+      Think about the person you want to be one month from now.
+    </p>
+  </div>
+
+  <div class="month-section">
+    <div class="month-label">01 — MY FUTURE SELF</div>
+    <div class="month-question">
+      1ヶ月後、どんな自分になっていたい？
+    </div>
+    <textarea
+      class="month-textarea"
+      id="futureSelf"
+      placeholder="I want to become someone who..."
+    ></textarea>
+  </div>
+
+  <div class="month-section">
+    <div class="month-label">02 — NEW SKILLS</div>
+    <div class="month-question">
+      1ヶ月後、何ができるようになっていたい？
+    </div>
+    <textarea
+      class="month-textarea"
+      id="newSkills"
+      placeholder="I want to be able to..."
+    ></textarea>
+  </div>
+
+  <div class="month-section">
+    <div class="month-label">03 — MY GOALS</div>
+    <div class="month-question">
+      今月、達成したいことは？
+    </div>
+    <textarea
+      class="month-textarea"
+      id="monthlyGoals"
+      placeholder="My goals this month..."
+    ></textarea>
+  </div>
+
+  <div class="month-section">
+    <div class="month-label">04 — ONE THING TO CHANGE</div>
+    <div class="month-question">
+      今の自分から変えたいことは？
+    </div>
+    <textarea
+      class="month-textarea"
+      id="oneThing"
+      placeholder="One thing I want to change..."
+    ></textarea>
+  </div>
+
+  <div class="month-footer">
+    <h3>One month. One step.</h3>
+    <p>
+      Small actions today create a different tomorrow.
+    </p>
+    <div class="save-status" id="saveStatus">SAVED</div>
+  </div>
+
+</div>
+
+<div class="page-indicator">
+  <span id="dotWeekly" class="active"></span>
+  <span id="dotMonthly"></span>
+</div>
+
+</div>
+
 
 <script>
 
@@ -277,29 +506,23 @@ if ("serviceWorker" in navigator) {
 
   let hadController = !!navigator.serviceWorker.controller;
 
-  navigator.serviceWorker.addEventListener(
-    "controllerchange",
-    () => {
-      if (hadController) {
-        location.reload();
-      }
-
-      hadController = true;
-    }
-  );
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hadController) location.reload();
+    hadController = true;
+  });
 
   window.addEventListener("load", async () => {
     try {
       const registration =
         await navigator.serviceWorker.register("./sw.js", {
-          scope: "./",
-          updateViaCache: "none"
+          scope:"./",
+          updateViaCache:"none"
         });
 
       await registration.update();
 
-    } catch (error) {
-      console.log("Update check failed:", error);
+    } catch(error) {
+      console.log("Update check failed:",error);
     }
   });
 }
@@ -315,29 +538,21 @@ function dateKey(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth()+1).padStart(2,"0");
   const d = String(date.getDate()).padStart(2,"0");
-
-  return y + "-" + m + "-" + d;
+  return y+"-"+m+"-"+d;
 }
 
 function getMonday(date) {
   const monday = new Date(date);
   const day = (monday.getDay()+6)%7;
-
   monday.setDate(monday.getDate()-day);
   monday.setHours(0,0,0,0);
-
   return monday;
 }
 
-
-// 現在の週の開始日
 let currentWeekStart = dateKey(getMonday(new Date()));
-
 let tasks = [];
 let savedWeekStart = currentWeekStart;
 
-
-// 保存データの読み込み
 try {
   const stored = localStorage.getItem(STORAGE_KEY);
 
@@ -351,57 +566,37 @@ try {
       savedWeekStart = data.weekStart || currentWeekStart;
     }
   }
-
 } catch(e) {
-  console.error("Data loading error:", e);
+  console.error("Data loading error:",e);
 }
 
-
-// 新しい週になっていたら未完了タスクだけ残す
 if (savedWeekStart !== currentWeekStart) {
-
   tasks = tasks.filter(t => !t.done);
-
   tasks.forEach(t => delete t.completedAt);
-
   savedWeekStart = currentWeekStart;
 }
 
-
-// 未完了・完了の順番に統一
 function sortTasks() {
-
   tasks = [
     ...tasks.filter(t => !t.done),
     ...tasks.filter(t => t.done)
   ];
-
 }
 
 sortTasks();
 
-
-// 保存
 function save() {
-
   try {
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      weekStart: currentWeekStart,
-      tasks: tasks
+    localStorage.setItem(STORAGE_KEY,JSON.stringify({
+      weekStart:currentWeekStart,
+      tasks:tasks
     }));
-
   } catch(e) {
-
-    console.error("Data saving error:", e);
+    console.error("Data saving error:",e);
     alert("Could not save data.");
-
   }
-
 }
 
-
-// 初回または週更新時の保存
 save();
 
 
@@ -411,74 +606,46 @@ save();
 
 let weekCheckTimer = null;
 
-
-// 週が変わったか確認
 function checkWeekChange() {
 
-  const latestWeekStart =
-    dateKey(getMonday(new Date()));
+  const latestWeekStart = dateKey(getMonday(new Date()));
 
   if (latestWeekStart !== currentWeekStart) {
-
     currentWeekStart = latestWeekStart;
-
-    // 未完了タスクだけ次の週に引き継ぐ
     tasks = tasks.filter(t => !t.done);
-
-    // 完了日の記録をリセット
     tasks.forEach(t => delete t.completedAt);
-
     sortTasks();
-
     save();
-
     render();
-
   }
 
   scheduleNextWeekCheck();
-
 }
 
-
-// 次の月曜日0時に確認する
 function scheduleNextWeekCheck() {
 
   clearTimeout(weekCheckTimer);
 
   const now = new Date();
-
   const nextMonday = getMonday(now);
 
   nextMonday.setDate(nextMonday.getDate()+7);
   nextMonday.setHours(0,0,0,0);
 
-  const delay = nextMonday.getTime()-now.getTime();
-
-  weekCheckTimer = setTimeout(() => {
-    checkWeekChange();
-  }, delay);
-
+  weekCheckTimer = setTimeout(
+    checkWeekChange,
+    nextMonday.getTime()-now.getTime()
+  );
 }
 
-
-// アプリを再表示したときにも確認
-document.addEventListener("visibilitychange", () => {
-
-  if (!document.hidden) {
-    checkWeekChange();
-  }
-
+document.addEventListener("visibilitychange",() => {
+  if (!document.hidden) checkWeekChange();
 });
 
-
-// iPhoneのページ復帰時にも確認
-window.addEventListener("pageshow", () => {
+window.addEventListener("pageshow",() => {
   checkWeekChange();
 });
 
-
-// 初回タイマー設定
 scheduleNextWeekCheck();
 
 
@@ -490,123 +657,100 @@ function getWeekDates() {
 
   const monday = getMonday(new Date());
 
-  return Array.from({length:7},(_,i)=>{
-
+  return Array.from({length:7},(_,i) => {
     const d = new Date(monday);
-
     d.setDate(monday.getDate()+i);
-
     return d;
-
   });
-
 }
-
 
 let weekDates = getWeekDates();
 
-
 function formatDate(date) {
-
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString("en-US",{
     month:"short",
     day:"numeric"
   });
-
 }
-
 
 function updateWeekDisplay() {
 
   weekDates = getWeekDates();
 
   document.getElementById("period").textContent =
-    formatDate(weekDates[0]) + " — " +
-    formatDate(weekDates[6]) + ", " +
+    formatDate(weekDates[0])+" — "+
+    formatDate(weekDates[6])+", "+
     weekDates[6].getFullYear();
-
 }
 
 
 // =====================================
-// RENDER
+// RENDER WEEKLY
 // =====================================
 
 function render() {
 
   updateWeekDisplay();
 
-  const done = tasks.filter(t=>t.done).length;
+  const done = tasks.filter(t => t.done).length;
 
   document.getElementById("progress").textContent =
-    done + " / " + tasks.length + " DONE";
-
+    done+" / "+tasks.length+" DONE";
 
   document.getElementById("weekdays").innerHTML =
-    weekDates.map((date,i)=>{
+    weekDates.map((date,i) => {
 
       const key = dateKey(date);
-
-      const active = tasks.some(t=>t.completedAt===key);
+      const active = tasks.some(t => t.completedAt===key);
 
       return `
         <div class="day">
           <span class="day-date">${date.getDate()}</span>
           <span>${["MON","TUE","WED","THU","FRI","SAT","SUN"][i]}</span>
-          <div class="day-dot ${active?'active':''}"></div>
+          <div class="day-dot ${active?"active":""}"></div>
         </div>
       `;
 
     }).join("");
 
-
   document.getElementById("list").innerHTML =
-    tasks.length === 0
+    tasks.length===0
 
-      ? `
-        <div class="empty-state">
-          <svg class="empty-icon" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1.5"
-               stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="5" width="18" height="16" rx="2"/>
-            <path d="M16 3v4M8 3v4M3 10h18"/>
-            <path d="M8 14h.01M12 14h.01M16 14h.01"/>
-          </svg>
-          <div class="empty-title">No tasks yet</div>
-          <div class="empty-description">
-            Add your first task to get started.
-          </div>
+    ? `
+      <div class="empty-state">
+        <svg class="empty-icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="5" width="18" height="16" rx="2"/>
+          <path d="M16 3v4M8 3v4M3 10h18"/>
+          <path d="M8 14h.01M12 14h.01M16 14h.01"/>
+        </svg>
+        <div class="empty-title">No tasks yet</div>
+        <div class="empty-description">
+          Add your first task to get started.
         </div>
-      `
+      </div>
+    `
 
-      : tasks.map((t,i)=>`
-
-        <div class="task ${t.done?'done':''}" data-index="${i}">
-          <div class="circle" onclick="toggle(${i})"></div>
-          <span class="task-name">${escapeHTML(t.name)}</span>
-          <span class="remove" onclick="removeTask(${i})">×</span>
-        </div>
-
-      `).join("");
-
+    : tasks.map((t,i) => `
+      <div class="task ${t.done?"done":""}" data-index="${i}">
+        <div class="circle" onclick="toggle(${i})"></div>
+        <span class="task-name">${escapeHTML(t.name)}</span>
+        <span class="remove" onclick="removeTask(${i})">×</span>
+      </div>
+    `).join("");
 
   setupDrag();
-
 }
 
-
 function escapeHTML(s) {
-
-  return String(s).replace(/[&<>"']/g,c=>({
-
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-
+  return String(s).replace(/[&<>"']/g,c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
   }[c]));
-
 }
 
 
@@ -619,26 +763,19 @@ function toggle(i) {
   checkWeekChange();
 
   const task = tasks[i];
-
   if (!task) return;
 
   task.done = !task.done;
 
   if (task.done) {
-
     task.completedAt = dateKey(new Date());
-
   } else {
-
     delete task.completedAt;
-
   }
 
   sortTasks();
-
   render();
   save();
-
 }
 
 
@@ -651,81 +788,53 @@ function addTask() {
   checkWeekChange();
 
   const input = document.getElementById("newTask");
-
   const name = input.value.trim();
 
   if (!name) return;
 
-  const task = {
-    name:name,
-    done:false
-  };
+  const task = {name:name,done:false};
 
-
-  // 未完了グループの最後に追加
   const firstDone = tasks.findIndex(t => t.done);
 
-  if (firstDone === -1) {
-
+  if (firstDone===-1) {
     tasks.push(task);
-
   } else {
-
-    tasks.splice(firstDone, 0, task);
-
+    tasks.splice(firstDone,0,task);
   }
 
-
-  input.value = "";
-
+  input.value="";
   render();
   save();
-
 }
 
 
 // =====================================
-// JAPANESE IME ENTER HANDLING
+// ENTER HANDLING
 // =====================================
 
 const taskInput = document.getElementById("newTask");
-
 let isTaskInputComposing = false;
 
-
-taskInput.addEventListener("compositionstart", () => {
-
+taskInput.addEventListener("compositionstart",() => {
   isTaskInputComposing = true;
-
 });
 
-
-taskInput.addEventListener("compositionend", () => {
-
+taskInput.addEventListener("compositionend",() => {
   isTaskInputComposing = false;
-
 });
 
+taskInput.addEventListener("keydown",event => {
 
-taskInput.addEventListener("keydown", event => {
+  if (event.key!=="Enter") return;
 
-  if (event.key !== "Enter") return;
-
-  // 日本語変換中のEnterでは追加しない
   if (
     isTaskInputComposing ||
     event.isComposing ||
-    event.keyCode === 229
-  ) {
-
-    return;
-
-  }
+    event.keyCode===229
+  ) return;
 
   event.preventDefault();
-
   addTask();
-
 });
 
 
@@ -737,13 +846,11 @@ function removeTask(i) {
 
   checkWeekChange();
 
-  if (i < 0 || i >= tasks.length) return;
+  if (i<0 || i>=tasks.length) return;
 
   tasks.splice(i,1);
-
   render();
   save();
-
 }
 
 
@@ -756,187 +863,314 @@ let dragStarted = false;
 let pressTimer = null;
 let startY = 0;
 
-
 function setupDrag() {
 
   const rows = document.querySelectorAll(".task");
 
   rows.forEach(row => {
 
-
-    row.addEventListener("touchstart", e => {
+    row.addEventListener("touchstart",e => {
 
       if (
         e.target.closest(".circle") ||
         e.target.closest(".remove")
       ) return;
 
-
       const touch = e.touches[0];
 
       dragIndex = Number(row.dataset.index);
-
       startY = touch.clientY;
-
       dragStarted = false;
 
       clearTimeout(pressTimer);
 
-
       pressTimer = setTimeout(() => {
-
         dragStarted = true;
-
         row.classList.add("dragging");
-
         document.body.classList.add("dragging");
+      },300);
 
-      }, 300);
+    },{passive:true});
 
-    }, {passive:true});
-
-
-    row.addEventListener("touchmove", e => {
+    row.addEventListener("touchmove",e => {
 
       const touch = e.touches[0];
 
-
       if (!dragStarted) {
-
         if (Math.abs(touch.clientY-startY)>10) {
           clearTimeout(pressTimer);
         }
-
         return;
-
       }
-
 
       e.preventDefault();
 
-
       const target = document.elementFromPoint(
-        touch.clientX,
-        touch.clientY
+        touch.clientX,touch.clientY
       );
 
-
-      const targetRow = target
-        ? target.closest(".task")
-        : null;
-
+      const targetRow = target ? target.closest(".task") : null;
 
       document.querySelectorAll(".task").forEach(r => {
-
         r.classList.remove("drag-target");
-
       });
 
-
       if (targetRow) {
-
         const targetIndex = Number(targetRow.dataset.index);
-
-        if (targetIndex !== dragIndex) {
-
+        if (targetIndex!==dragIndex) {
           targetRow.classList.add("drag-target");
-
         }
-
       }
 
-    }, {passive:false});
+    },{passive:false});
 
-
-    row.addEventListener("touchend", e => {
+    row.addEventListener("touchend",e => {
 
       clearTimeout(pressTimer);
 
-
       if (!dragStarted) {
-
         dragIndex = null;
-
         return;
-
       }
-
 
       const touch = e.changedTouches[0];
 
-
       const target = document.elementFromPoint(
-        touch.clientX,
-        touch.clientY
+        touch.clientX,touch.clientY
       );
 
-
-      const targetRow = target
-        ? target.closest(".task")
-        : null;
-
+      const targetRow = target ? target.closest(".task") : null;
 
       if (targetRow) {
 
         const targetIndex = Number(targetRow.dataset.index);
 
-
         if (
-          targetIndex !== dragIndex &&
+          targetIndex!==dragIndex &&
           tasks[dragIndex] &&
           tasks[targetIndex] &&
-          tasks[dragIndex].done === tasks[targetIndex].done
+          tasks[dragIndex].done===tasks[targetIndex].done
         ) {
 
           const moved = tasks.splice(dragIndex,1)[0];
 
-          const insertIndex = targetIndex > dragIndex
-            ? targetIndex
-            : targetIndex;
-
-          tasks.splice(insertIndex,0,moved);
+          tasks.splice(targetIndex,0,moved);
 
           sortTasks();
-
           save();
-
         }
-
       }
 
-
       dragIndex = null;
-
       dragStarted = false;
 
       document.body.classList.remove("dragging");
 
       render();
 
-    }, {passive:true});
+    },{passive:true});
 
-
-    row.addEventListener("touchcancel", () => {
+    row.addEventListener("touchcancel",() => {
 
       clearTimeout(pressTimer);
 
       if (dragStarted) {
-
         dragIndex = null;
-
         dragStarted = false;
-
         document.body.classList.remove("dragging");
-
         render();
-
       }
 
     });
 
   });
-
 }
+
+
+// =====================================
+// MONTHLY DATA
+// =====================================
+
+const MONTHLY_STORAGE_KEY = "plan-monthly-data";
+
+function getMonthKey(date) {
+  return date.getFullYear()+"-"+
+    String(date.getMonth()+1).padStart(2,"0");
+}
+
+function getMonthName(date) {
+  return date.toLocaleDateString("en-US",{
+    month:"long",
+    year:"numeric"
+  }).toUpperCase();
+}
+
+let currentMonthKey = getMonthKey(new Date());
+
+let monthlyData = {};
+
+try {
+  const stored = localStorage.getItem(MONTHLY_STORAGE_KEY);
+  if (stored) {
+    monthlyData = JSON.parse(stored) || {};
+  }
+} catch(e) {
+  console.error("Monthly data loading error:",e);
+}
+
+function getCurrentMonthData() {
+
+  if (!monthlyData[currentMonthKey]) {
+    monthlyData[currentMonthKey] = {
+      futureSelf:"",
+      newSkills:"",
+      monthlyGoals:"",
+      oneThing:""
+    };
+  }
+
+  return monthlyData[currentMonthKey];
+}
+
+function saveMonthly() {
+
+  const data = getCurrentMonthData();
+
+  data.futureSelf = document.getElementById("futureSelf").value;
+  data.newSkills = document.getElementById("newSkills").value;
+  data.monthlyGoals = document.getElementById("monthlyGoals").value;
+  data.oneThing = document.getElementById("oneThing").value;
+
+  try {
+    localStorage.setItem(
+      MONTHLY_STORAGE_KEY,
+      JSON.stringify(monthlyData)
+    );
+
+    document.getElementById("saveStatus").textContent = "SAVED";
+
+  } catch(e) {
+    document.getElementById("saveStatus").textContent = "SAVE ERROR";
+    console.error("Monthly save error:",e);
+  }
+}
+
+function loadMonthly() {
+
+  const now = new Date();
+
+  currentMonthKey = getMonthKey(now);
+
+  document.getElementById("monthPeriod").textContent =
+    getMonthName(now);
+
+  const data = getCurrentMonthData();
+
+  document.getElementById("futureSelf").value = data.futureSelf || "";
+  document.getElementById("newSkills").value = data.newSkills || "";
+  document.getElementById("monthlyGoals").value = data.monthlyGoals || "";
+  document.getElementById("oneThing").value = data.oneThing || "";
+}
+
+document.querySelectorAll(".month-textarea").forEach(textarea => {
+
+  textarea.addEventListener("input",() => {
+    saveMonthly();
+  });
+
+});
+
+loadMonthly();
+
+
+// =====================================
+// SWIPE PAGE NAVIGATION
+// =====================================
+
+let currentPage = "weekly";
+
+const weeklyPage = document.getElementById("weekly");
+const monthlyPage = document.getElementById("monthly");
+
+function showPage(page) {
+
+  if (page===currentPage) return;
+
+  currentPage = page;
+
+  if (page==="monthly") {
+
+    weeklyPage.style.display = "none";
+    monthlyPage.style.display = "block";
+
+    loadMonthly();
+
+  } else {
+
+    monthlyPage.style.display = "none";
+    weeklyPage.style.display = "block";
+
+    checkWeekChange();
+
+  }
+
+  document.getElementById("dotWeekly").classList.toggle(
+    "active",page==="weekly"
+  );
+
+  document.getElementById("dotMonthly").classList.toggle(
+    "active",page==="monthly"
+  );
+
+  window.scrollTo(0,0);
+}
+
+
+// Swipe detection
+let swipeStartX = 0;
+let swipeStartY = 0;
+let swipeTracking = false;
+
+document.addEventListener("touchstart",e => {
+
+  if (e.touches.length!==1) return;
+
+  swipeStartX = e.touches[0].clientX;
+  swipeStartY = e.touches[0].clientY;
+
+  swipeTracking = true;
+
+},{passive:true});
+
+document.addEventListener("touchend",e => {
+
+  if (!swipeTracking) return;
+
+  swipeTracking = false;
+
+  const touch = e.changedTouches[0];
+
+  const diffX = touch.clientX-swipeStartX;
+  const diffY = touch.clientY-swipeStartY;
+
+  // Vertical movement should not change pages
+  if (Math.abs(diffY)>Math.abs(diffX)) return;
+
+  // Ignore short movements
+  if (Math.abs(diffX)<65) return;
+
+  // Ignore gestures inside textareas
+  if (e.target.closest("textarea")) return;
+
+  if (diffX<0 && currentPage==="weekly") {
+    showPage("monthly");
+  }
+
+  if (diffX>0 && currentPage==="monthly") {
+    showPage("weekly");
+  }
+
+},{passive:true});
 
 
 // =====================================
