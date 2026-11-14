@@ -269,6 +269,7 @@ if ("serviceWorker" in navigator) {
       if (hadController) {
         location.reload();
       }
+
       hadController = true;
     }
   );
@@ -300,18 +301,23 @@ function dateKey(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth()+1).padStart(2,"0");
   const d = String(date.getDate()).padStart(2,"0");
+
   return y + "-" + m + "-" + d;
 }
 
 function getMonday(date) {
   const monday = new Date(date);
   const day = (monday.getDay()+6)%7;
+
   monday.setDate(monday.getDate()-day);
   monday.setHours(0,0,0,0);
+
   return monday;
 }
 
-const currentWeekStart = dateKey(getMonday(new Date()));
+
+// 現在の週の開始日
+let currentWeekStart = dateKey(getMonday(new Date()));
 
 let tasks = [];
 let savedWeekStart = currentWeekStart;
@@ -331,6 +337,7 @@ try {
       savedWeekStart = data.weekStart || currentWeekStart;
     }
   }
+
 } catch(e) {
   console.error("Data loading error:", e);
 }
@@ -338,34 +345,45 @@ try {
 
 // 新しい週になっていたら未完了タスクだけ残す
 if (savedWeekStart !== currentWeekStart) {
+
   tasks = tasks.filter(t => !t.done);
+
   tasks.forEach(t => delete t.completedAt);
+
   savedWeekStart = currentWeekStart;
 }
 
 
 // 未完了・完了の順番に統一
-sortTasks();
-
 function sortTasks() {
+
   tasks = [
     ...tasks.filter(t => !t.done),
     ...tasks.filter(t => t.done)
   ];
+
 }
+
+sortTasks();
 
 
 // 保存
 function save() {
+
   try {
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       weekStart: currentWeekStart,
       tasks: tasks
     }));
+
   } catch(e) {
+
     console.error("Data saving error:", e);
     alert("Could not save data.");
+
   }
+
 }
 
 
@@ -374,32 +392,130 @@ save();
 
 
 // =====================================
+// AUTOMATIC WEEK UPDATE
+// =====================================
+
+let weekCheckTimer = null;
+
+
+// 週が変わったか確認
+function checkWeekChange() {
+
+  const latestWeekStart =
+    dateKey(getMonday(new Date()));
+
+  if (latestWeekStart !== currentWeekStart) {
+
+    currentWeekStart = latestWeekStart;
+
+    // 未完了タスクだけ次の週に引き継ぐ
+    tasks = tasks.filter(t => !t.done);
+
+    // 完了日の記録をリセット
+    tasks.forEach(t => delete t.completedAt);
+
+    sortTasks();
+
+    save();
+
+    render();
+
+  }
+
+  scheduleNextWeekCheck();
+
+}
+
+
+// 次の月曜日0時に確認する
+function scheduleNextWeekCheck() {
+
+  clearTimeout(weekCheckTimer);
+
+  const now = new Date();
+
+  const nextMonday = getMonday(now);
+
+  nextMonday.setDate(nextMonday.getDate()+7);
+  nextMonday.setHours(0,0,0,0);
+
+  const delay = nextMonday.getTime()-now.getTime();
+
+  weekCheckTimer = setTimeout(() => {
+    checkWeekChange();
+  }, delay);
+
+}
+
+
+// アプリを再表示したときにも確認
+document.addEventListener("visibilitychange", () => {
+
+  if (!document.hidden) {
+    checkWeekChange();
+  }
+
+});
+
+
+// iPhoneのページ復帰時にも確認
+window.addEventListener("pageshow", () => {
+  checkWeekChange();
+});
+
+
+// 初回タイマー設定
+scheduleNextWeekCheck();
+
+
+// =====================================
 // WEEK DISPLAY
 // =====================================
 
 function getWeekDates() {
+
   const monday = getMonday(new Date());
 
   return Array.from({length:7},(_,i)=>{
+
     const d = new Date(monday);
+
     d.setDate(monday.getDate()+i);
+
     return d;
+
   });
+
 }
 
-const weekDates = getWeekDates();
+
+let weekDates = getWeekDates();
+
 
 function formatDate(date) {
+
   return date.toLocaleDateString("en-US", {
     month:"short",
     day:"numeric"
   });
+
 }
 
-document.getElementById("period").textContent =
-  formatDate(weekDates[0]) + " — " +
-  formatDate(weekDates[6]) + ", " +
-  weekDates[6].getFullYear();
+
+function updateWeekDisplay() {
+
+  weekDates = getWeekDates();
+
+  document.getElementById("period").textContent =
+    formatDate(weekDates[0]) + " — " +
+    formatDate(weekDates[6]) + ", " +
+    weekDates[6].getFullYear();
+
+}
+
+
+// 初回表示
+updateWeekDisplay();
 
 
 // =====================================
@@ -407,14 +523,20 @@ document.getElementById("period").textContent =
 // =====================================
 
 function render() {
+
+  updateWeekDisplay();
+
   const done = tasks.filter(t=>t.done).length;
 
   document.getElementById("progress").textContent =
     done + " / " + tasks.length + " DONE";
 
+
   document.getElementById("weekdays").innerHTML =
     weekDates.map((date,i)=>{
+
       const key = dateKey(date);
+
       const active = tasks.some(t=>t.completedAt===key);
 
       return `
@@ -424,10 +546,13 @@ function render() {
           <div class="day-dot ${active?'active':''}"></div>
         </div>
       `;
+
     }).join("");
+
 
   document.getElementById("list").innerHTML =
     tasks.length === 0
+
       ? `
         <div class="empty-state">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none"
@@ -443,25 +568,35 @@ function render() {
           </div>
         </div>
       `
+
       : tasks.map((t,i)=>`
+
         <div class="task ${t.done?'done':''}" data-index="${i}">
           <div class="circle" onclick="toggle(${i})"></div>
           <span class="task-name">${escapeHTML(t.name)}</span>
           <span class="remove" onclick="removeTask(${i})">×</span>
         </div>
+
       `).join("");
 
+
   setupDrag();
+
 }
 
+
 function escapeHTML(s) {
+
   return String(s).replace(/[&<>"']/g,c=>({
+
     '&':'&amp;',
     '<':'&lt;',
     '>':'&gt;',
     '"':'&quot;',
     "'":'&#39;'
+
   }[c]));
+
 }
 
 
@@ -470,6 +605,9 @@ function escapeHTML(s) {
 // =====================================
 
 function toggle(i) {
+
+  checkWeekChange();
+
   const task = tasks[i];
 
   if (!task) return;
@@ -477,15 +615,20 @@ function toggle(i) {
   task.done = !task.done;
 
   if (task.done) {
+
     task.completedAt = dateKey(new Date());
+
   } else {
+
     delete task.completedAt;
+
   }
 
   sortTasks();
 
   render();
   save();
+
 }
 
 
@@ -494,7 +637,11 @@ function toggle(i) {
 // =====================================
 
 function addTask() {
+
+  checkWeekChange();
+
   const input = document.getElementById("newTask");
+
   const name = input.value.trim();
 
   if (!name) return;
@@ -504,18 +651,26 @@ function addTask() {
     done:false
   };
 
+
   // 未完了グループの最後に追加
   const firstDone = tasks.findIndex(t => t.done);
 
   if (firstDone === -1) {
+
     tasks.push(task);
+
   } else {
+
     tasks.splice(firstDone, 0, task);
+
   }
 
+
   input.value = "";
+
   render();
   save();
+
 }
 
 
@@ -527,27 +682,38 @@ const taskInput = document.getElementById("newTask");
 
 let isTaskInputComposing = false;
 
+
 taskInput.addEventListener("compositionstart", () => {
+
   isTaskInputComposing = true;
+
 });
 
+
 taskInput.addEventListener("compositionend", () => {
+
   isTaskInputComposing = false;
+
 });
+
 
 taskInput.addEventListener("keydown", event => {
 
   if (event.key !== "Enter") return;
 
+  // 日本語変換中のEnterでは追加しない
   if (
     isTaskInputComposing ||
     event.isComposing ||
     event.keyCode === 229
   ) {
+
     return;
+
   }
 
   event.preventDefault();
+
   addTask();
 
 });
@@ -558,11 +724,16 @@ taskInput.addEventListener("keydown", event => {
 // =====================================
 
 function removeTask(i) {
+
+  checkWeekChange();
+
   if (i < 0 || i >= tasks.length) return;
 
   tasks.splice(i,1);
+
   render();
   save();
+
 }
 
 
@@ -575,89 +746,130 @@ let dragStarted = false;
 let pressTimer = null;
 let startY = 0;
 
+
 function setupDrag() {
+
   const rows = document.querySelectorAll(".task");
 
   rows.forEach(row => {
 
+
     row.addEventListener("touchstart", e => {
-      if (e.target.closest(".circle") ||
-          e.target.closest(".remove")) return;
+
+      if (
+        e.target.closest(".circle") ||
+        e.target.closest(".remove")
+      ) return;
+
 
       const touch = e.touches[0];
 
       dragIndex = Number(row.dataset.index);
+
       startY = touch.clientY;
+
       dragStarted = false;
 
       clearTimeout(pressTimer);
 
+
       pressTimer = setTimeout(() => {
+
         dragStarted = true;
+
         row.classList.add("dragging");
+
         document.body.classList.add("dragging");
+
       }, 300);
 
     }, {passive:true});
 
 
     row.addEventListener("touchmove", e => {
+
       const touch = e.touches[0];
 
+
       if (!dragStarted) {
+
         if (Math.abs(touch.clientY-startY)>10) {
           clearTimeout(pressTimer);
         }
+
         return;
+
       }
 
+
       e.preventDefault();
+
 
       const target = document.elementFromPoint(
         touch.clientX,
         touch.clientY
       );
 
+
       const targetRow = target
         ? target.closest(".task")
         : null;
 
+
       document.querySelectorAll(".task").forEach(r => {
+
         r.classList.remove("drag-target");
+
       });
 
+
       if (targetRow) {
+
         const targetIndex = Number(targetRow.dataset.index);
 
         if (targetIndex !== dragIndex) {
+
           targetRow.classList.add("drag-target");
+
         }
+
       }
 
     }, {passive:false});
 
 
     row.addEventListener("touchend", e => {
+
       clearTimeout(pressTimer);
 
+
       if (!dragStarted) {
+
         dragIndex = null;
+
         return;
+
       }
 
+
       const touch = e.changedTouches[0];
+
 
       const target = document.elementFromPoint(
         touch.clientX,
         touch.clientY
       );
 
+
       const targetRow = target
         ? target.closest(".task")
         : null;
 
+
       if (targetRow) {
+
         const targetIndex = Number(targetRow.dataset.index);
+
 
         if (
           targetIndex !== dragIndex &&
@@ -665,6 +877,7 @@ function setupDrag() {
           tasks[targetIndex] &&
           tasks[dragIndex].done === tasks[targetIndex].done
         ) {
+
           const moved = tasks.splice(dragIndex,1)[0];
 
           const insertIndex = targetIndex > dragIndex
@@ -674,12 +887,18 @@ function setupDrag() {
           tasks.splice(insertIndex,0,moved);
 
           sortTasks();
+
           save();
+
         }
+
       }
 
+
       dragIndex = null;
+
       dragStarted = false;
+
       document.body.classList.remove("dragging");
 
       render();
@@ -688,17 +907,25 @@ function setupDrag() {
 
 
     row.addEventListener("touchcancel", () => {
+
       clearTimeout(pressTimer);
 
       if (dragStarted) {
+
         dragIndex = null;
+
         dragStarted = false;
+
         document.body.classList.remove("dragging");
+
         render();
+
       }
+
     });
 
   });
+
 }
 
 
