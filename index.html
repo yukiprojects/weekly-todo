@@ -250,6 +250,65 @@ body.dragging {
 </div>
 
 <script>
+
+// =====================================
+// APP VERSION
+// =====================================
+
+// 新しいコードを公開するときは、この番号を変更する
+const APP_VERSION = "2026-11-14-2";
+
+
+// =====================================
+// AUTO UPDATE CHECK
+// =====================================
+
+async function checkForUpdates() {
+  try {
+    const checkURL = new URL(location.pathname, location.origin);
+
+    // キャッシュを避けて最新HTMLを取得
+    checkURL.searchParams.set("_update_check", Date.now());
+
+    const response = await fetch(checkURL.toString(), {
+      cache: "no-store"
+    });
+
+    if (!response.ok) return;
+
+    const html = await response.text();
+
+    // 最新HTML内のバージョン番号を取得
+    const match = html.match(
+      /const APP_VERSION = ["']([^"']+)["'];/
+    );
+
+    if (!match) return;
+
+    const latestVersion = match[1];
+
+    // バージョンが違う場合だけ更新
+    if (latestVersion !== APP_VERSION) {
+
+      const updateURL = new URL(location.href);
+
+      updateURL.searchParams.set("v", latestVersion);
+      updateURL.searchParams.delete("_update_check");
+
+      location.replace(updateURL.toString());
+    }
+
+  } catch (error) {
+    // 更新確認に失敗しても通常利用は継続
+    console.log("Update check skipped:", error);
+  }
+}
+
+
+// =====================================
+// TASK DATA
+// =====================================
+
 const STORAGE_KEY = "weekly-todo-data";
 
 function dateKey(date) {
@@ -272,6 +331,7 @@ const currentWeekStart = dateKey(getMonday(new Date()));
 let tasks = [];
 let savedWeekStart = currentWeekStart;
 
+
 // 保存データの読み込み
 try {
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -290,6 +350,7 @@ try {
   console.error("Data loading error:", e);
 }
 
+
 // 新しい週になっていたら未完了タスクだけ残す
 if (savedWeekStart !== currentWeekStart) {
   tasks = tasks.filter(t => !t.done);
@@ -297,7 +358,8 @@ if (savedWeekStart !== currentWeekStart) {
   savedWeekStart = currentWeekStart;
 }
 
-// 読み込み時点で未完了・完了の順番に統一
+
+// 未完了・完了の順番に統一
 sortTasks();
 
 function sortTasks() {
@@ -307,6 +369,8 @@ function sortTasks() {
   ];
 }
 
+
+// 保存
 function save() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -319,8 +383,14 @@ function save() {
   }
 }
 
+
 // 初回または週更新時の保存
 save();
+
+
+// =====================================
+// WEEK DISPLAY
+// =====================================
 
 function getWeekDates() {
   const monday = getMonday(new Date());
@@ -345,6 +415,11 @@ document.getElementById("period").textContent =
   formatDate(weekDates[0]) + " — " +
   formatDate(weekDates[6]) + ", " +
   weekDates[6].getFullYear();
+
+
+// =====================================
+// RENDER
+// =====================================
 
 function render() {
   const done = tasks.filter(t=>t.done).length;
@@ -404,7 +479,11 @@ function escapeHTML(s) {
   }[c]));
 }
 
-// チェック切り替え
+
+// =====================================
+// TOGGLE TASK
+// =====================================
+
 function toggle(i) {
   const task = tasks[i];
 
@@ -418,14 +497,17 @@ function toggle(i) {
     delete task.completedAt;
   }
 
-  // 未完了を上、完了を下に再配置
   sortTasks();
 
   render();
   save();
 }
 
-// タスク追加
+
+// =====================================
+// ADD TASK
+// =====================================
+
 function addTask() {
   const input = document.getElementById("newTask");
   const name = input.value.trim();
@@ -451,7 +533,11 @@ function addTask() {
   save();
 }
 
-// タスク削除
+
+// =====================================
+// REMOVE TASK
+// =====================================
+
 function removeTask(i) {
   if (i < 0 || i >= tasks.length) return;
 
@@ -460,7 +546,11 @@ function removeTask(i) {
   save();
 }
 
-// 長押しドラッグによる並べ替え
+
+// =====================================
+// DRAG AND DROP
+// =====================================
+
 let dragIndex = null;
 let dragStarted = false;
 let pressTimer = null;
@@ -470,6 +560,7 @@ function setupDrag() {
   const rows = document.querySelectorAll(".task");
 
   rows.forEach(row => {
+
     row.addEventListener("touchstart", e => {
       if (e.target.closest(".circle") ||
           e.target.closest(".remove")) return;
@@ -489,6 +580,7 @@ function setupDrag() {
       }, 300);
 
     }, {passive:true});
+
 
     row.addEventListener("touchmove", e => {
       const touch = e.touches[0];
@@ -525,6 +617,7 @@ function setupDrag() {
 
     }, {passive:false});
 
+
     row.addEventListener("touchend", e => {
       clearTimeout(pressTimer);
 
@@ -555,7 +648,6 @@ function setupDrag() {
         ) {
           const moved = tasks.splice(dragIndex,1)[0];
 
-          // 削除後の位置を補正
           const insertIndex = targetIndex > dragIndex
             ? targetIndex
             : targetIndex;
@@ -575,6 +667,7 @@ function setupDrag() {
 
     }, {passive:true});
 
+
     row.addEventListener("touchcancel", () => {
       clearTimeout(pressTimer);
 
@@ -585,10 +678,20 @@ function setupDrag() {
         render();
       }
     });
+
   });
 }
 
+
+// =====================================
+// START APP
+// =====================================
+
 render();
+
+// 起動後にバックグラウンドで更新確認
+checkForUpdates();
+
 </script>
 
 </body>
