@@ -2107,6 +2107,8 @@ function showPage(page) {
 
   if (page===currentPage) return;
 
+  localStorage.setItem("plan-last-page", page);
+
   if (page!=="monthly") {
     closeArchiveIfOpen();
   }
@@ -2228,6 +2230,10 @@ document.addEventListener("touchcancel",() => {
 
 render();
 renderDaily();
+
+  const lastPage = localStorage.getItem("plan-last-page") || "weekly";
+
+showPage(lastPage);
 
 </script>
 
