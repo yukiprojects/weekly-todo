@@ -4,8 +4,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
 <meta name="theme-color" content="#111111">
-<title>Weekly ToDo</title>
+<meta name="description" content="PLAN. — Keep your plans on track.">
+<meta name="application-name" content="PLAN.">
+
+<!-- PWA -->
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+
+<!-- iPhone -->
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PLAN.">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<title>PLAN. — Weekly</title>
 
 <style>
 * { box-sizing:border-box; }
@@ -512,10 +526,6 @@ function updateWeekDisplay() {
     weekDates[6].getFullYear();
 
 }
-
-
-// 初回表示
-updateWeekDisplay();
 
 
 // =====================================
