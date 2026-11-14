@@ -270,7 +270,6 @@ function getMonday(date) {
 const currentWeekStart = dateKey(getMonday(new Date()));
 
 let tasks = [];
-
 let savedWeekStart = currentWeekStart;
 
 // 保存データの読み込み
@@ -337,8 +336,17 @@ document.getElementById("period").textContent =
   formatDate(weekDates[6]) + ", " +
   weekDates[6].getFullYear();
 
+// 未完了を上、完了を下に表示
+function getSortedTasks() {
+  return [
+    ...tasks.filter(t => !t.done),
+    ...tasks.filter(t => t.done)
+  ];
+}
+
 function render() {
   const done = tasks.filter(t=>t.done).length;
+  const sortedTasks = getSortedTasks();
 
   document.getElementById("progress").textContent =
     done + " / " + tasks.length + " DONE";
@@ -374,7 +382,7 @@ function render() {
           </div>
         </div>
       `
-      : tasks.map((t,i)=>`
+      : sortedTasks.map((t,i)=>`
         <div class="task ${t.done?'done':''}" data-index="${i}">
           <div class="circle" onclick="toggle(${i})"></div>
           <span class="task-name">${escapeHTML(t.name)}</span>
@@ -395,13 +403,41 @@ function escapeHTML(s) {
   }[c]));
 }
 
+// チェックを切り替えたタスクを移動先グループの最後に配置
 function toggle(i) {
-  tasks[i].done = !tasks[i].done;
+  const sortedTasks = getSortedTasks();
+  const task = sortedTasks[i];
 
-  if (tasks[i].done) {
-    tasks[i].completedAt = dateKey(new Date());
+  if (!task) return;
+
+  task.done = !task.done;
+
+  if (task.done) {
+    task.completedAt = dateKey(new Date());
   } else {
-    delete tasks[i].completedAt;
+    delete task.completedAt;
+  }
+
+  const remaining = tasks.filter(t => t !== task);
+
+  // 元の配列から一度取り除き、移動先グループの最後に追加
+  tasks = remaining;
+
+  if (task.done) {
+    const lastUndoneIndex = tasks.findIndex(t => t.done);
+
+    if (lastUndoneIndex === -1) {
+      tasks.push(task);
+    } else {
+      tasks.splice(lastUndoneIndex, 0, task);
+    }
+  } else {
+    const lastUndoneIndex = tasks.reduce(
+      (last, t, index) => !t.done ? index : last,
+      -1
+    );
+
+    tasks.splice(lastUndoneIndex + 1, 0, task);
   }
 
   render();
@@ -414,14 +450,29 @@ function addTask() {
 
   if (!name) return;
 
-  tasks.push({name:name,done:false});
+  // 新しいタスクは未完了グループの最後に追加
+  const lastUndoneIndex = tasks.reduce(
+    (last, t, index) => !t.done ? index : last,
+    -1
+  );
+
+  tasks.splice(lastUndoneIndex + 1, 0, {
+    name:name,
+    done:false
+  });
+
   input.value = "";
   render();
   save();
 }
 
 function removeTask(i) {
-  tasks.splice(i,1);
+  const sortedTasks = getSortedTasks();
+  const task = sortedTasks[i];
+
+  if (!task) return;
+
+  tasks = tasks.filter(t => t !== task);
   render();
   save();
 }
@@ -515,9 +566,31 @@ function setupDrag() {
         const targetIndex = Number(targetRow.dataset.index);
 
         if (targetIndex !== dragIndex) {
-          const moved = tasks.splice(dragIndex,1)[0];
-          tasks.splice(targetIndex,0,moved);
-          save();
+          const moved = sortedTaskAt(dragIndex);
+          const target = sortedTaskAt(targetIndex);
+
+          if (moved && target && moved.done === target.done) {
+            const group = tasks.filter(t => t.done === moved.done);
+            const from = group.indexOf(moved);
+            const to = group.indexOf(target);
+
+            group.splice(from, 1);
+            group.splice(to, 0, moved);
+
+            tasks = [
+              ...tasks.filter(t => !t.done),
+              ...tasks.filter(t => t.done)
+            ];
+
+            const reorderedGroup = group;
+            const otherGroup = tasks.filter(t => t.done !== moved.done);
+
+            tasks = moved.done
+              ? [...otherGroup, ...reorderedGroup]
+              : [...reorderedGroup, ...otherGroup];
+
+            save();
+          }
         }
       }
 
@@ -540,6 +613,10 @@ function setupDrag() {
       }
     });
   });
+}
+
+function sortedTaskAt(index) {
+  return getSortedTasks()[index];
 }
 
 render();
