@@ -256,51 +256,37 @@ body.dragging {
 <script>
 
 // =====================================
-// APP VERSION
+// SERVICE WORKER AUTO UPDATE
 // =====================================
 
-const APP_VERSION = "2026-11-14-3";
+if ("serviceWorker" in navigator) {
 
+  let hadController = !!navigator.serviceWorker.controller;
 
-// =====================================
-// AUTO UPDATE CHECK
-// =====================================
-
-async function checkForUpdates() {
-  try {
-    const checkURL = new URL(location.pathname, location.origin);
-
-    checkURL.searchParams.set("_update_check", Date.now());
-
-    const response = await fetch(checkURL.toString(), {
-      cache: "no-store"
-    });
-
-    if (!response.ok) return;
-
-    const html = await response.text();
-
-    const match = html.match(
-      /const APP_VERSION = ["']([^"']+)["'];/
-    );
-
-    if (!match) return;
-
-    const latestVersion = match[1];
-
-    if (latestVersion !== APP_VERSION) {
-
-      const updateURL = new URL(location.href);
-
-      updateURL.searchParams.set("v", latestVersion);
-      updateURL.searchParams.delete("_update_check");
-
-      location.replace(updateURL.toString());
+  navigator.serviceWorker.addEventListener(
+    "controllerchange",
+    () => {
+      if (hadController) {
+        location.reload();
+      }
+      hadController = true;
     }
+  );
 
-  } catch (error) {
-    console.log("Update check skipped:", error);
-  }
+  window.addEventListener("load", async () => {
+    try {
+      const registration =
+        await navigator.serviceWorker.register("./sw.js", {
+          scope: "./",
+          updateViaCache: "none"
+        });
+
+      await registration.update();
+
+    } catch (error) {
+      console.log("Update check failed:", error);
+    }
+  });
 }
 
 
@@ -553,7 +539,6 @@ taskInput.addEventListener("keydown", event => {
 
   if (event.key !== "Enter") return;
 
-  // 日本語変換中のEnterでは追加しない
   if (
     isTaskInputComposing ||
     event.isComposing ||
@@ -562,7 +547,6 @@ taskInput.addEventListener("keydown", event => {
     return;
   }
 
-  // 変換確定後のEnterでタスク追加
   event.preventDefault();
   addTask();
 
@@ -723,9 +707,6 @@ function setupDrag() {
 // =====================================
 
 render();
-
-// 起動後にバックグラウンドで更新確認
-checkForUpdates();
 
 </script>
 
