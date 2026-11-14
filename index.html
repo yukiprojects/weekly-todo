@@ -249,6 +249,13 @@ body.dragging {
   margin-bottom:38px;
 }
 
+.month-topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
 .month-title {
   font-size:32px;
   letter-spacing:3px;
@@ -259,6 +266,23 @@ body.dragging {
   color:#888;
   font-size:11px;
   margin-top:8px;
+}
+
+.past-button {
+  background:transparent;
+  color:#888;
+  border:1px solid #444;
+  border-radius:7px;
+  padding:9px 10px;
+  font-size:9px;
+  letter-spacing:1px;
+  font-weight:600;
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+.past-button:active {
+  opacity:.6;
 }
 
 .month-intro {
@@ -348,7 +372,104 @@ body.dragging {
   text-align:right;
 }
 
-/* SWIPE INDICATOR */
+/* =====================================
+   PAST MONTHS ARCHIVE
+===================================== */
+
+#archive {
+  display:none;
+}
+
+.archive-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:35px;
+}
+
+.archive-title {
+  font-size:25px;
+  letter-spacing:2px;
+  margin:0;
+}
+
+.archive-close {
+  background:transparent;
+  color:#aaa;
+  border:1px solid #444;
+  border-radius:7px;
+  padding:9px 12px;
+  font-size:10px;
+  letter-spacing:1px;
+  cursor:pointer;
+}
+
+.archive-description {
+  color:#777;
+  font-size:12px;
+  line-height:1.6;
+  margin:-17px 0 30px;
+}
+
+.history-month {
+  border-top:1px solid #333;
+  padding-top:25px;
+  margin-bottom:32px;
+}
+
+.history-month-title {
+  font-size:17px;
+  font-weight:600;
+  letter-spacing:1.5px;
+  margin-bottom:25px;
+  color:#75d69b;
+}
+
+.history-item {
+  margin-bottom:22px;
+}
+
+.history-label {
+  font-size:10px;
+  letter-spacing:1.3px;
+  color:#888;
+  margin-bottom:9px;
+}
+
+.history-value {
+  color:#eee;
+  font-size:14px;
+  line-height:1.7;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+.history-value.empty {
+  color:#555;
+  font-style:italic;
+}
+
+.archive-empty {
+  border-top:1px solid #333;
+  padding:45px 10px;
+  text-align:center;
+}
+
+.archive-empty-title {
+  color:#ddd;
+  font-size:15px;
+  margin-bottom:10px;
+}
+
+.archive-empty-description {
+  color:#777;
+  font-size:12px;
+  line-height:1.6;
+}
+
+/* =====================================
+   PAGE INDICATOR
+===================================== */
 
 .page-indicator {
   display:flex;
@@ -418,75 +539,108 @@ body.dragging {
 
 <div class="page" id="monthly">
 
-  <div class="month-header">
-    <h1 class="month-title">MONTHLY.</h1>
-    <div class="month-period" id="monthPeriod"></div>
+  <div id="monthlyMain">
+
+    <div class="month-header">
+
+      <div class="month-topbar">
+        <h1 class="month-title">MONTHLY.</h1>
+        <button class="past-button" onclick="showArchive()">
+          PAST MONTHS
+        </button>
+      </div>
+
+      <div class="month-period" id="monthPeriod"></div>
+
+    </div>
+
+    <div class="month-intro">
+      <h2>Who do I want to become?</h2>
+      <p>
+        Think about the person you want to be one month from now.
+      </p>
+    </div>
+
+    <div class="month-section">
+      <div class="month-label">01 — MY FUTURE SELF</div>
+      <div class="month-question">
+        1ヶ月後、どんな自分になっていたい？
+      </div>
+      <textarea
+        class="month-textarea"
+        id="futureSelf"
+        placeholder="I want to become someone who..."
+      ></textarea>
+    </div>
+
+    <div class="month-section">
+      <div class="month-label">02 — NEW SKILLS</div>
+      <div class="month-question">
+        1ヶ月後、何ができるようになっていたい？
+      </div>
+      <textarea
+        class="month-textarea"
+        id="newSkills"
+        placeholder="I want to be able to..."
+      ></textarea>
+    </div>
+
+    <div class="month-section">
+      <div class="month-label">03 — MY GOALS</div>
+      <div class="month-question">
+        今月、達成したいことは？
+      </div>
+      <textarea
+        class="month-textarea"
+        id="monthlyGoals"
+        placeholder="My goals this month..."
+      ></textarea>
+    </div>
+
+    <div class="month-section">
+      <div class="month-label">04 — ONE THING TO CHANGE</div>
+      <div class="month-question">
+        今の自分から変えたいことは？
+      </div>
+      <textarea
+        class="month-textarea"
+        id="oneThing"
+        placeholder="One thing I want to change..."
+      ></textarea>
+    </div>
+
+    <div class="month-footer">
+      <h3>One month. One step.</h3>
+      <p>
+        Small actions today create a different tomorrow.
+      </p>
+      <div class="save-status" id="saveStatus">SAVED</div>
+    </div>
+
   </div>
 
-  <div class="month-intro">
-    <h2>Who do I want to become?</h2>
-    <p>
-      Think about the person you want to be one month from now.
+
+  <!-- PAST MONTHS ARCHIVE -->
+
+  <div id="archive">
+
+    <div class="archive-header">
+      <h2 class="archive-title">PAST MONTHS</h2>
+      <button class="archive-close" onclick="closeArchive()">
+        CLOSE ×
+      </button>
+    </div>
+
+    <p class="archive-description">
+      Look back at your previous reflections.
     </p>
-  </div>
 
-  <div class="month-section">
-    <div class="month-label">01 — MY FUTURE SELF</div>
-    <div class="month-question">
-      1ヶ月後、どんな自分になっていたい？
-    </div>
-    <textarea
-      class="month-textarea"
-      id="futureSelf"
-      placeholder="I want to become someone who..."
-    ></textarea>
-  </div>
+    <div id="historyList"></div>
 
-  <div class="month-section">
-    <div class="month-label">02 — NEW SKILLS</div>
-    <div class="month-question">
-      1ヶ月後、何ができるようになっていたい？
-    </div>
-    <textarea
-      class="month-textarea"
-      id="newSkills"
-      placeholder="I want to be able to..."
-    ></textarea>
-  </div>
-
-  <div class="month-section">
-    <div class="month-label">03 — MY GOALS</div>
-    <div class="month-question">
-      今月、達成したいことは？
-    </div>
-    <textarea
-      class="month-textarea"
-      id="monthlyGoals"
-      placeholder="My goals this month..."
-    ></textarea>
-  </div>
-
-  <div class="month-section">
-    <div class="month-label">04 — ONE THING TO CHANGE</div>
-    <div class="month-question">
-      今の自分から変えたいことは？
-    </div>
-    <textarea
-      class="month-textarea"
-      id="oneThing"
-      placeholder="One thing I want to change..."
-    ></textarea>
-  </div>
-
-  <div class="month-footer">
-    <h3>One month. One step.</h3>
-    <p>
-      Small actions today create a different tomorrow.
-    </p>
-    <div class="save-status" id="saveStatus">SAVED</div>
   </div>
 
 </div>
+
 
 <div class="page-indicator">
   <span id="dotWeekly" class="active"></span>
@@ -993,6 +1147,25 @@ function setupDrag() {
 
 const MONTHLY_STORAGE_KEY = "plan-monthly-data";
 
+const MONTHLY_FIELDS = [
+  {
+    key:"futureSelf",
+    label:"MY FUTURE SELF"
+  },
+  {
+    key:"newSkills",
+    label:"NEW SKILLS"
+  },
+  {
+    key:"monthlyGoals",
+    label:"MY GOALS"
+  },
+  {
+    key:"oneThing",
+    label:"ONE THING TO CHANGE"
+  }
+];
+
 function getMonthKey(date) {
   return date.getFullYear()+"-"+
     String(date.getMonth()+1).padStart(2,"0");
@@ -1011,8 +1184,17 @@ let monthlyData = {};
 
 try {
   const stored = localStorage.getItem(MONTHLY_STORAGE_KEY);
+
   if (stored) {
-    monthlyData = JSON.parse(stored) || {};
+    const parsed = JSON.parse(stored);
+
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      !Array.isArray(parsed)
+    ) {
+      monthlyData = parsed;
+    }
   }
 } catch(e) {
   console.error("Monthly data loading error:",e);
@@ -1020,7 +1202,10 @@ try {
 
 function getCurrentMonthData() {
 
-  if (!monthlyData[currentMonthKey]) {
+  if (
+    !monthlyData[currentMonthKey] ||
+    typeof monthlyData[currentMonthKey] !== "object"
+  ) {
     monthlyData[currentMonthKey] = {
       futureSelf:"",
       newSkills:"",
@@ -1084,6 +1269,128 @@ loadMonthly();
 
 
 // =====================================
+// PAST MONTHS ARCHIVE
+// =====================================
+
+function formatArchiveMonth(monthKey) {
+
+  const parts = monthKey.split("-");
+
+  if (parts.length !== 2) return monthKey;
+
+  const year = Number(parts[0]);
+  const month = Number(parts[1]);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    month < 1 ||
+    month > 12
+  ) {
+    return monthKey;
+  }
+
+  const date = new Date(year,month-1,1);
+
+  return getMonthName(date);
+}
+
+function hasRecordedContent(data) {
+
+  if (!data || typeof data !== "object") return false;
+
+  return MONTHLY_FIELDS.some(field => {
+    return String(data[field.key] || "").trim() !== "";
+  });
+}
+
+function renderArchive() {
+
+  const historyList = document.getElementById("historyList");
+
+  const nowMonthKey = getMonthKey(new Date());
+
+  const pastMonths = Object.keys(monthlyData)
+    .filter(key => {
+      return (
+        /^\d{4}-\d{2}$/.test(key) &&
+        key < nowMonthKey &&
+        hasRecordedContent(monthlyData[key])
+      );
+    })
+    .sort((a,b) => b.localeCompare(a));
+
+  if (pastMonths.length === 0) {
+
+    historyList.innerHTML = `
+      <div class="archive-empty">
+        <div class="archive-empty-title">
+          No past records yet
+        </div>
+        <div class="archive-empty-description">
+          Your previous monthly reflections<br>
+          will appear here.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+  historyList.innerHTML = pastMonths.map(monthKey => {
+
+    const data = monthlyData[monthKey] || {};
+
+    const items = MONTHLY_FIELDS.map(field => {
+
+      const value = String(data[field.key] || "").trim();
+
+      return `
+        <div class="history-item">
+          <div class="history-label">
+            ${field.label}
+          </div>
+          <div class="history-value ${value ? "" : "empty"}">${value ? escapeHTML(value) : "Not recorded"}</div>
+        </div>
+      `;
+
+    }).join("");
+
+    return `
+      <div class="history-month">
+        <div class="history-month-title">
+          ${escapeHTML(formatArchiveMonth(monthKey))}
+        </div>
+        ${items}
+      </div>
+    `;
+
+  }).join("");
+}
+
+function showArchive() {
+
+  // Save the latest values before opening the archive.
+  saveMonthly();
+
+  renderArchive();
+
+  document.getElementById("monthlyMain").style.display = "none";
+  document.getElementById("archive").style.display = "block";
+
+  window.scrollTo(0,0);
+}
+
+function closeArchive() {
+
+  document.getElementById("archive").style.display = "none";
+  document.getElementById("monthlyMain").style.display = "block";
+
+  window.scrollTo(0,0);
+}
+
+
+// =====================================
 // SWIPE PAGE NAVIGATION
 // =====================================
 
@@ -1095,6 +1402,11 @@ const monthlyPage = document.getElementById("monthly");
 function showPage(page) {
 
   if (page===currentPage) return;
+
+  // Close archive before leaving MONTHLY.
+  if (page==="weekly") {
+    closeArchiveIfOpen();
+  }
 
   currentPage = page;
 
@@ -1125,15 +1437,36 @@ function showPage(page) {
   window.scrollTo(0,0);
 }
 
+function closeArchiveIfOpen() {
+
+  document.getElementById("archive").style.display = "none";
+  document.getElementById("monthlyMain").style.display = "block";
+}
+
 
 // Swipe detection
+
 let swipeStartX = 0;
 let swipeStartY = 0;
 let swipeTracking = false;
+let swipeBlocked = false;
 
 document.addEventListener("touchstart",e => {
 
-  if (e.touches.length!==1) return;
+  if (e.touches.length!==1) {
+    swipeTracking = false;
+    return;
+  }
+
+  const target = e.target;
+
+  swipeBlocked = !!(
+    target.closest("textarea") ||
+    target.closest("input") ||
+    target.closest("button") ||
+    target.closest(".task") ||
+    target.closest(".add-area")
+  );
 
   swipeStartX = e.touches[0].clientX;
   swipeStartY = e.touches[0].clientY;
@@ -1148,19 +1481,23 @@ document.addEventListener("touchend",e => {
 
   swipeTracking = false;
 
+  if (swipeBlocked) return;
+
+  // Do not navigate while the archive is open.
+  if (
+    document.getElementById("archive").style.display === "block"
+  ) return;
+
   const touch = e.changedTouches[0];
 
   const diffX = touch.clientX-swipeStartX;
   const diffY = touch.clientY-swipeStartY;
 
-  // Vertical movement should not change pages
+  // Vertical movement should not change pages.
   if (Math.abs(diffY)>Math.abs(diffX)) return;
 
-  // Ignore short movements
+  // Ignore short movements.
   if (Math.abs(diffX)<65) return;
-
-  // Ignore gestures inside textareas
-  if (e.target.closest("textarea")) return;
 
   if (diffX<0 && currentPage==="weekly") {
     showPage("monthly");
