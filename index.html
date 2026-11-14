@@ -1355,11 +1355,14 @@ function setupDrag() {
       const touch = e.touches[0];
 
       if (!dragStarted) {
-        if (Math.abs(touch.clientY-startY)>10) {
-          clearTimeout(pressTimer);
-        }
-        return;
-      }
+  if (
+    Math.abs(touch.clientY-startY)>10 ||
+    Math.abs(touch.clientX-swipeStartX)>10
+  ) {
+    clearTimeout(pressTimer);
+  }
+  return;
+}
 
       e.preventDefault();
 
@@ -2144,6 +2147,7 @@ function showPage(page) {
 }
 
 
+
 // =====================================
 // SWIPE DETECTION
 // =====================================
@@ -2151,27 +2155,13 @@ function showPage(page) {
 let swipeStartX = 0;
 let swipeStartY = 0;
 let swipeTracking = false;
-let swipeBlocked = false;
 
 document.addEventListener("touchstart",e => {
 
-  if (e.touches.length!==1) {
+  if (e.touches.length !== 1) {
     swipeTracking = false;
     return;
   }
-
-  const target = e.target;
-
-  swipeBlocked = !!(
-    target.closest("textarea") ||
-    target.closest("input") ||
-    target.closest("button") ||
-    target.closest("select") ||
-    target.closest(".task") ||
-    target.closest(".add-area") ||
-    target.closest(".event-editor") ||
-    target.closest(".daily-event")
-  );
 
   swipeStartX = e.touches[0].clientX;
   swipeStartY = e.touches[0].clientY;
@@ -2180,42 +2170,54 @@ document.addEventListener("touchstart",e => {
 
 },{passive:true});
 
+
 document.addEventListener("touchend",e => {
 
   if (!swipeTracking) return;
 
   swipeTracking = false;
 
-  if (swipeBlocked) return;
+  // Do not navigate while dragging a task.
+  if (document.body.classList.contains("dragging")) return;
 
+  // Do not navigate while the archive is open.
   if (
-    document.getElementById("archive").style.display==="block"
+    document.getElementById("archive").style.display === "block"
   ) return;
 
   const touch = e.changedTouches[0];
 
-  const diffX = touch.clientX-swipeStartX;
-  const diffY = touch.clientY-swipeStartY;
+  const diffX = touch.clientX - swipeStartX;
+  const diffY = touch.clientY - swipeStartY;
 
-  if (Math.abs(diffY)>Math.abs(diffX)) return;
-  if (Math.abs(diffX)<65) return;
+  // Ignore vertical scrolling.
+  if (Math.abs(diffX) < Math.abs(diffY) * 1.2) return;
 
-  if (currentPage==="weekly") {
+  // Require a minimum horizontal movement.
+  if (Math.abs(diffX) < 65) return;
 
-    if (diffX<0) showPage("monthly");
-    if (diffX>0) showPage("daily");
+  if (currentPage === "weekly") {
 
-  } else if (currentPage==="monthly") {
+    if (diffX < 0) showPage("monthly");
+    if (diffX > 0) showPage("daily");
 
-    if (diffX>0) showPage("weekly");
+  } else if (currentPage === "monthly") {
 
-  } else if (currentPage==="daily") {
+    if (diffX > 0) showPage("weekly");
 
-    if (diffX<0) showPage("weekly");
+  } else if (currentPage === "daily") {
+
+    if (diffX < 0) showPage("weekly");
 
   }
 
 },{passive:true});
+
+
+document.addEventListener("touchcancel",() => {
+  swipeTracking = false;
+},{passive:true});
+  
 
 
 // =====================================
