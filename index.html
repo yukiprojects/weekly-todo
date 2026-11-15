@@ -1828,6 +1828,7 @@ function goToday() {
 
 
 
+
 // =====================================
 // DAILY SETTINGS
 // =====================================
@@ -1851,7 +1852,7 @@ function openDailySettings() {
   document.getElementById("dailyEndTime").value =
     saved.endTime;
 
-  // Center panel on the screen
+  // Center panel on screen
   panel.style.position = "fixed";
   panel.style.top = "50%";
   panel.style.left = "50%";
@@ -1878,11 +1879,28 @@ function populateDailyTimeSettings() {
   startSelect.innerHTML = "";
   endSelect.innerHTML = "";
 
+  // Start time: 00:00–23:00
   for (let hour = 0; hour < 24; hour++) {
     const value = String(hour).padStart(2, "0") + ":00";
 
     startSelect.add(new Option(value, value));
-    endSelect.add(new Option(value, value));
+  }
+
+  // End time: 00:00–27:00
+  for (let hour = 0; hour <= 27; hour++) {
+    const value = String(hour).padStart(2, "0") + ":00";
+
+    let label = value;
+
+    if (hour >= 24) {
+      const nextDayHour = hour - 24;
+
+      label =
+        String(nextDayHour).padStart(2, "0") +
+        ":00 (+1 day)";
+    }
+
+    endSelect.add(new Option(label, value));
   }
 }
 
@@ -1903,7 +1921,6 @@ function saveDailySettings() {
 
   location.reload();
 }
-
 
 
 // =====================================
