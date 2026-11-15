@@ -319,6 +319,47 @@ body.dragging {
   flex-shrink:0;
 }
 
+  .daily-settings-panel {
+  margin: 12px 0;
+  padding: 16px;
+  background: #1c1c1c;
+  border: 1px solid #383838;
+  border-radius: 10px;
+}
+
+.daily-settings-panel h3 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  color: white;
+}
+
+.daily-settings-panel label {
+  display: block;
+  margin: 12px 0 6px;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.daily-settings-panel select {
+  width: 100%;
+  padding: 12px;
+  background: #292929;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
+.daily-settings-panel button {
+  margin-top: 16px;
+  margin-right: 8px;
+  padding: 10px 16px;
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 7px;
+}
+
 .daily-sub {
   color:#888;
   font-size:11px;
@@ -811,6 +852,19 @@ body.dragging {
     onclick="openDailySettings()"
     aria-label="Daily settings"
   >⚙️</button>
+</div>
+
+      <div id="dailySettingsPanel" class="daily-settings-panel" style="display:none;">
+  <h3>DAILY SETTINGS</h3>
+
+  <label for="dailyStartTime">Start time</label>
+  <select id="dailyStartTime"></select>
+
+  <label for="dailyEndTime">End time</label>
+  <select id="dailyEndTime"></select>
+
+  <button onclick="saveDailySettings()">SAVE</button>
+  <button onclick="closeDailySettings()">CANCEL</button>
 </div>
     </div>
 
