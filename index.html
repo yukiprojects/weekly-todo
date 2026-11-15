@@ -1785,6 +1785,24 @@ function closeDailySettings() {
   panel.style.display = "none";
 }
 
+  function populateDailyTimeSettings() {
+  const startSelect = document.getElementById("dailyStartTime");
+  const endSelect = document.getElementById("dailyEndTime");
+
+  startSelect.innerHTML = "";
+  endSelect.innerHTML = "";
+
+  for (let hour = 0; hour < 24; hour++) {
+    const value = String(hour).padStart(2, "0") + ":00";
+
+    startSelect.add(new Option(value, value));
+    endSelect.add(new Option(value, value));
+  }
+
+  startSelect.value = "05:00";
+  endSelect.value = "02:00";
+}
+
 // =====================================
 // DAILY EVENT EDITOR
 // =====================================
