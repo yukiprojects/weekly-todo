@@ -782,6 +782,203 @@ body.dragging {
 
 .page-indicator span.active { background:#75d69b; }
 
+
+/* =====================================
+   RESPONSIVE LAYOUT
+   ALL DEVICES
+===================================== */
+
+/* Prevent horizontal overflow */
+html {
+  width: 100%;
+  max-width: 100%;
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  padding-left: clamp(12px, 5vw, 24px);
+  padding-right: clamp(12px, 5vw, 24px);
+}
+
+#app,
+.page {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.brand {
+  min-width: 0;
+}
+
+.task-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+input,
+textarea,
+select {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Tablet and small desktop */
+@media screen and (max-width: 768px) {
+
+  .month-topbar {
+    flex-wrap: wrap;
+  }
+
+  .month-topbar .brand {
+    flex: 1 1 220px;
+    min-width: 0;
+  }
+
+  .past-button {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+}
+
+/* Narrow smartphones */
+@media screen and (max-width: 420px) {
+
+  /* WEEKLY */
+  header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .progress {
+    font-size: 11px;
+  }
+
+  .weekdays {
+    padding-left: 0;
+    padding-right: 0;
+    gap: 4px;
+  }
+
+  .day {
+    min-width: 0;
+    flex: 1;
+  }
+
+  /* DAILY */
+  .daily-date-row {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    row-gap: 12px;
+  }
+
+  .date-nav {
+    display: flex;
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .daily-date {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    text-align: center;
+  }
+
+  .daily-actions {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .daily-settings-button {
+    flex-shrink: 0;
+  }
+
+  /* MONTHLY */
+  .month-topbar {
+    align-items: flex-start;
+    row-gap: 12px;
+  }
+
+  .month-topbar .brand {
+    flex: 1 1 220px;
+  }
+
+  .month-title {
+    font-size: clamp(27px, 8vw, 32px);
+  }
+
+  .past-button {
+    margin-left: auto;
+  }
+
+  /* ARCHIVE */
+  .archive-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .archive-title {
+    font-size: clamp(21px, 6vw, 25px);
+  }
+
+  /* COMMON */
+  .add-area {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .add-area input {
+    min-width: 0;
+  }
+
+  .timeline {
+    max-width: 100%;
+  }
+
+}
+
+/* Extra narrow smartphones */
+@media screen and (max-width: 350px) {
+
+  h1,
+  .daily-title {
+    font-size: 27px;
+    letter-spacing: 2px;
+  }
+
+  .calendar-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .today-button {
+    padding: 8px;
+    font-size: 9px;
+  }
+
+  .month-intro h2 {
+    font-size: 22px;
+  }
+
+  .editor-actions {
+    flex-wrap: wrap;
+  }
+
+}
+
+
+  
 </style>
 </head>
 
