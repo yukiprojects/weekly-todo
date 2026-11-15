@@ -430,6 +430,10 @@ body.dragging {
   z-index:2;
 }
 
+ .timeline-hour.last-hour {
+  border-bottom: none;
+}
+
 .timeline-track {
   position:absolute;
   left:0;
@@ -1947,10 +1951,13 @@ function renderTimeline() {
     const time = formatDailyTimeLabel(offset);
 
     hoursHTML += `
-      <div class="timeline-hour" style="top:${top}px;">
-        <span class="timeline-hour-label">${time}</span>
-      </div>
-    `;
+  <div
+    class="timeline-hour ${i === TOTAL_HOURS ? 'last-hour' : ''}"
+    style="top:${top}px;"
+  >
+    <span class="timeline-hour-label">${time}</span>
+  </div>
+`;
   }
 
   track.innerHTML = hoursHTML;
