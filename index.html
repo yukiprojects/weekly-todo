@@ -1777,9 +1777,22 @@ function goToday() {
 
 function openDailySettings() {
   const panel = document.getElementById("dailySettingsPanel");
+
+  populateDailyTimeSettings();
+
+  const saved = JSON.parse(
+    localStorage.getItem("plan-daily-settings") || "null"
+  );
+
+  if (saved) {
+    document.getElementById("dailyStartTime").value = saved.startTime;
+    document.getElementById("dailyEndTime").value = saved.endTime;
+  }
+
   panel.style.display = "block";
 }
-
+  
+  
 function closeDailySettings() {
   const panel = document.getElementById("dailySettingsPanel");
   panel.style.display = "none";
