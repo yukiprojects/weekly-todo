@@ -255,7 +255,9 @@ body.dragging {
   overflow:hidden;
 }
 
-.daily-header { margin-bottom:28px; }
+.daily-header {
+  margin-bottom:0;
+}
 
 .daily-title {
   font-size:32px;
@@ -1095,17 +1097,8 @@ select {
   <button onclick="saveDailySettings()">SAVE</button>
   <button onclick="closeDailySettings()">CANCEL</button>
 </div>
-    </div>
-
-    <div class="daily-sub" id="dailyDateLabel">
-      YOUR DAY, YOUR PLAN.
-    </div>
   </div>
-
-  <div class="daily-section-label">DAILY SCHEDULE</div>
-
-  <div class="daily-hint">
-    Tap an empty time slot to add an event. Tap an event to edit it.
+ 
   </div>
 
     <div class="daily-scroll-area" id="dailyScrollArea">
