@@ -1771,6 +1771,19 @@ function goToday() {
   renderDaily();
 }
 
+  // =====================================
+// DAILY SETTINGS
+// =====================================
+
+function openDailySettings() {
+  const panel = document.getElementById("dailySettingsPanel");
+  panel.style.display = "block";
+}
+
+function closeDailySettings() {
+  const panel = document.getElementById("dailySettingsPanel");
+  panel.style.display = "none";
+}
 
 // =====================================
 // DAILY EVENT EDITOR
