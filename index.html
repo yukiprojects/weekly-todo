@@ -2047,32 +2047,37 @@ function scrollDailyToCurrentTime() {
 
   const currentOffset = nowMinutes - 300;
 
+  // Get the actual timeline range.
+  const range = getDailyTimeRange();
+
   // Keep the position within the displayed timeline.
   const clampedOffset = Math.max(
-    DAILY_START,
-    Math.min(DAILY_END, currentOffset)
+    range.start,
+    Math.min(range.end, currentOffset)
   );
 
   const timePosition =
-    (clampedOffset - DAILY_START) / 60 * HOUR_HEIGHT;
+    (clampedOffset - range.start) / 60 * HOUR_HEIGHT;
 
   const timeline = document.getElementById("timeline");
 
   const timelineTop =
     timeline.getBoundingClientRect().top + window.scrollY;
 
+  const viewportHeight =
+    window.visualViewport
+      ? window.visualViewport.height
+      : window.innerHeight;
+
   const targetScroll =
     timelineTop +
     timePosition -
-    window.innerHeight * DAILY_TIME_SCROLL_POSITION;
+    viewportHeight * DAILY_TIME_SCROLL_POSITION;
 
-  const maxScroll =
-    document.documentElement.scrollHeight - window.innerHeight;
-
-  window.scrollTo(
-    0,
-    Math.max(0, Math.min(targetScroll, maxScroll))
-  );
+  window.scrollTo({
+    top: Math.max(0, targetScroll),
+    behavior: "instant"
+  });
 }
 
 function changeDailyDate(amount) {
