@@ -1816,6 +1816,9 @@ function getDailyEvents() {
 
 const HOUR_HEIGHT = 72;
 
+  // Current time position on screen (30%)
+const DAILY_TIME_SCROLL_POSITION = 0.30;
+
 function getDailySettings() {
   try {
     const saved = JSON.parse(
