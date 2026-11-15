@@ -2665,6 +2665,17 @@ function showPage(page) {
   );
 
   window.scrollTo(0,0);
+
+if (
+  page === "daily" &&
+  selectedDailyDate === dateKey(new Date())
+) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      scrollDailyToCurrentTime();
+    });
+  });
+}
 }
 
 
