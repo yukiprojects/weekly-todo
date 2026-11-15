@@ -2024,6 +2024,54 @@ function renderDaily() {
   renderTimeline();
 }
 
+  // =====================================
+// AUTO SCROLL TO CURRENT TIME
+// =====================================
+
+function scrollDailyToCurrentTime() {
+
+  // Only scroll when viewing today.
+  if (selectedDailyDate !== dateKey(new Date())) return;
+
+  const now = new Date();
+
+  let nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // Treat times before 05:00 as the next day.
+  if (nowMinutes < 300) {
+    nowMinutes += 1440;
+  }
+
+  const currentOffset = nowMinutes - 300;
+
+  // Keep the position within the displayed timeline.
+  const clampedOffset = Math.max(
+    DAILY_START,
+    Math.min(DAILY_END, currentOffset)
+  );
+
+  const timePosition =
+    (clampedOffset - DAILY_START) / 60 * HOUR_HEIGHT;
+
+  const timeline = document.getElementById("timeline");
+
+  const timelineTop =
+    timeline.getBoundingClientRect().top + window.scrollY;
+
+  const targetScroll =
+    timelineTop +
+    timePosition -
+    window.innerHeight * DAILY_TIME_SCROLL_POSITION;
+
+  const maxScroll =
+    document.documentElement.scrollHeight - window.innerHeight;
+
+  window.scrollTo(
+    0,
+    Math.max(0, Math.min(targetScroll, maxScroll))
+  );
+}
+
 function changeDailyDate(amount) {
 
   const date = new Date(selectedDailyDate+"T12:00:00");
