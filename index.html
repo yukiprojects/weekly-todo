@@ -298,6 +298,27 @@ body.dragging {
   white-space:nowrap;
 }
 
+  .daily-actions {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.daily-settings-button {
+  width:36px;
+  height:36px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  color:#aaa;
+  border:1px solid #444;
+  border-radius:7px;
+  font-size:17px;
+  flex-shrink:0;
+}
+
 .daily-sub {
   color:#888;
   font-size:11px;
@@ -783,7 +804,14 @@ body.dragging {
         <button onclick="changeDailyDate(1)">›</button>
       </div>
 
-      <button class="today-button" onclick="goToday()">TODAY</button>
+      <div class="daily-actions">
+  <button class="today-button" onclick="goToday()">TODAY</button>
+  <button
+    class="daily-settings-button"
+    onclick="openDailySettings()"
+    aria-label="Daily settings"
+  >⚙️</button>
+</div>
     </div>
 
     <div class="daily-sub" id="dailyDateLabel">
