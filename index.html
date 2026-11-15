@@ -2053,24 +2053,20 @@ function renderDaily() {
 
 function scrollDailyToCurrentTime() {
 
-  // Only scroll when viewing today.
   if (selectedDailyDate !== dateKey(new Date())) return;
 
   const now = new Date();
 
   let nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // Treat times before 05:00 as the next day.
   if (nowMinutes < 300) {
     nowMinutes += 1440;
   }
 
   const currentOffset = nowMinutes - 300;
 
-  // Get the actual timeline range.
   const range = getDailyTimeRange();
 
-  // Keep the position within the displayed timeline.
   const clampedOffset = Math.max(
     range.start,
     Math.min(range.end, currentOffset)
@@ -2079,22 +2075,14 @@ function scrollDailyToCurrentTime() {
   const timePosition =
     (clampedOffset - range.start) / 60 * HOUR_HEIGHT;
 
-  const timeline = document.getElementById("timeline");
-
-  const timelineTop =
-    timeline.getBoundingClientRect().top + window.scrollY;
-
-  const viewportHeight =
-    window.visualViewport
-      ? window.visualViewport.height
-      : window.innerHeight;
+  const scrollArea =
+    document.getElementById("dailyScrollArea");
 
   const targetScroll =
-    timelineTop +
     timePosition -
-    viewportHeight * DAILY_TIME_SCROLL_POSITION;
+    scrollArea.clientHeight * DAILY_TIME_SCROLL_POSITION;
 
-  window.scrollTo({
+  scrollArea.scrollTo({
     top: Math.max(0, targetScroll),
     behavior: "instant"
   });
