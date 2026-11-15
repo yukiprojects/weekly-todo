@@ -2108,6 +2108,12 @@ function goToday() {
   selectedDailyDate = dateKey(new Date());
   closeEventEditor();
   renderDaily();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      scrollDailyToCurrentTime();
+    });
+  });
 }
 
 
