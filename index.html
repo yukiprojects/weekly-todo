@@ -1581,48 +1581,94 @@ function getDailyEvents() {
 }
 
 
+
 // =====================================
 // DAILY TIME HELPERS
 // =====================================
 
 // Time is stored as minutes after 05:00.
-// 00:00 next day = 1140
-// 02:00 next day = 1260
+// Existing event data remains unchanged.
 
-const DAILY_START = 0;
-const DAILY_END = 1260;
 const HOUR_HEIGHT = 72;
-const TOTAL_HOURS = 21;
+
+function getDailySettings() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem("plan-daily-settings") || "null"
+    );
+
+    return {
+      startTime: saved?.startTime || "05:00",
+      endTime: saved?.endTime || "02:00"
+    };
+  } catch (e) {
+    return {
+      startTime: "05:00",
+      endTime: "02:00"
+    };
+  }
+}
+
+function timeToOffset(time) {
+  const [hour, minute] = time.split(":").map(Number);
+  return hour * 60 + minute - 300;
+}
+
+function getDailyTimeRange() {
+  const settings = getDailySettings();
+
+  const start = timeToOffset(settings.startTime);
+  let end = timeToOffset(settings.endTime);
+
+  while (end <= start) {
+    end += 1440;
+  }
+
+  return {
+    start,
+    end,
+    hours: (end - start) / 60
+  };
+}
+
+const DAILY_START = getDailyTimeRange().start;
+const DAILY_END = getDailyTimeRange().end;
+const TOTAL_HOURS = getDailyTimeRange().hours;
 
 function formatDailyTime(offset) {
-
   const total = 300 + Number(offset);
-  const hour = Math.floor(total/60)%24;
-  const minute = total%60;
 
-  return String(hour).padStart(2,"0")+":"+
-    String(minute).padStart(2,"0");
+  const normalized = ((total % 1440) + 1440) % 1440;
+
+  const hour = Math.floor(normalized / 60);
+  const minute = normalized % 60;
+
+  return String(hour).padStart(2, "0") + ":" +
+    String(minute).padStart(2, "0");
 }
 
 function formatDailyTimeLabel(offset) {
-
+  const total = 300 + Number(offset);
   const time = formatDailyTime(offset);
 
-  if (offset>=1140) {
-    return time+" (+1 day)";
+  if (total >= 1440) {
+    return time + " (+1 day)";
   }
 
   return time;
 }
 
 function buildTimeOptions() {
-
   const startSelect = document.getElementById("eventStart");
   const endSelect = document.getElementById("eventEnd");
 
   let html = "";
 
-  for (let minute=DAILY_START;minute<=DAILY_END;minute+=15) {
+  for (
+    let minute = DAILY_START;
+    minute <= DAILY_END;
+    minute += 15
+  ) {
     html += `
       <option value="${minute}">
         ${escapeHTML(formatDailyTimeLabel(minute))}
@@ -1637,6 +1683,7 @@ function buildTimeOptions() {
 buildTimeOptions();
 
 
+
 // =====================================
 // DAILY TIMELINE
 // =====================================
@@ -1648,11 +1695,12 @@ function renderTimeline() {
 
   let hoursHTML = "";
 
-  for (let i=0;i<=TOTAL_HOURS;i++) {
+  // Hour lines
+  for (let i = 0; i <= TOTAL_HOURS; i++) {
 
-    const top = i*HOUR_HEIGHT;
-    const offset = i*60;
-    const time = formatDailyTime(offset);
+    const top = i * HOUR_HEIGHT;
+    const offset = DAILY_START + i * 60;
+    const time = formatDailyTimeLabel(offset);
 
     hoursHTML += `
       <div class="timeline-hour" style="top:${top}px;">
@@ -1663,34 +1711,41 @@ function renderTimeline() {
 
   track.innerHTML = hoursHTML;
 
-  // Tap an empty hourly area to create an event.
+  // Empty areas for adding events
   let addAreasHTML = "";
 
-  for (let i=0;i<TOTAL_HOURS;i++) {
+  for (let i = 0; i < TOTAL_HOURS; i++) {
+
+    const top = i * HOUR_HEIGHT;
+    const offset = DAILY_START + i * 60;
+
     addAreasHTML += `
       <div
         class="timeline-add"
-        style="top:${i*HOUR_HEIGHT}px;"
-        onclick="openEventForm(${i*60})"
+        style="top:${top}px;"
+        onclick="openEventForm(${offset})"
       ></div>
     `;
   }
 
-  track.insertAdjacentHTML("beforeend",addAreasHTML);
+  track.insertAdjacentHTML("beforeend", addAreasHTML);
 
+  // Existing events
   const events = getDailyEvents()
     .slice()
-    .sort((a,b) => Number(a.start)-Number(b.start));
+    .sort((a, b) => Number(a.start) - Number(b.start));
 
   eventsLayer.innerHTML = events.map(event => {
 
     const start = Number(event.start);
     const end = Number(event.end);
 
-    const top = start/60*HOUR_HEIGHT;
+    const top =
+      (start - DAILY_START) / 60 * HOUR_HEIGHT;
+
     const height = Math.max(
       30,
-      (end-start)/60*HOUR_HEIGHT
+      (end - start) / 60 * HOUR_HEIGHT
     );
 
     return `
@@ -1703,8 +1758,8 @@ function renderTimeline() {
           ${escapeHTML(event.title)}
         </div>
         <div class="daily-event-time">
-          ${escapeHTML(formatDailyTime(start))} –
-          ${escapeHTML(formatDailyTime(end))}
+          ${escapeHTML(formatDailyTimeLabel(start))} –
+          ${escapeHTML(formatDailyTimeLabel(end))}
         </div>
       </div>
     `;
@@ -1712,7 +1767,7 @@ function renderTimeline() {
   }).join("");
 
   document.getElementById("timeline").style.height =
-    (TOTAL_HOURS*HOUR_HEIGHT)+"px";
+    (TOTAL_HOURS * HOUR_HEIGHT) + "px";
 }
 
 
@@ -1771,7 +1826,8 @@ function goToday() {
   renderDaily();
 }
 
-  // =====================================
+
+// =====================================
 // DAILY SETTINGS
 // =====================================
 
@@ -1780,25 +1836,23 @@ function openDailySettings() {
 
   populateDailyTimeSettings();
 
-  const saved = JSON.parse(
-    localStorage.getItem("plan-daily-settings") || "null"
-  );
+  const saved = getDailySettings();
 
-  if (saved) {
-    document.getElementById("dailyStartTime").value = saved.startTime;
-    document.getElementById("dailyEndTime").value = saved.endTime;
-  }
+  document.getElementById("dailyStartTime").value =
+    saved.startTime;
+
+  document.getElementById("dailyEndTime").value =
+    saved.endTime;
 
   panel.style.display = "block";
 }
-  
-  
+
 function closeDailySettings() {
   const panel = document.getElementById("dailySettingsPanel");
   panel.style.display = "none";
 }
 
-  function populateDailyTimeSettings() {
+function populateDailyTimeSettings() {
   const startSelect = document.getElementById("dailyStartTime");
   const endSelect = document.getElementById("dailyEndTime");
 
@@ -1811,22 +1865,27 @@ function closeDailySettings() {
     startSelect.add(new Option(value, value));
     endSelect.add(new Option(value, value));
   }
-
-  startSelect.value = "05:00";
-  endSelect.value = "02:00";
 }
 
-  function saveDailySettings() {
-  const startTime = document.getElementById("dailyStartTime").value;
-  const endTime = document.getElementById("dailyEndTime").value;
+function saveDailySettings() {
+  const startTime =
+    document.getElementById("dailyStartTime").value;
 
-  localStorage.setItem("plan-daily-settings", JSON.stringify({
-    startTime,
-    endTime
-  }));
+  const endTime =
+    document.getElementById("dailyEndTime").value;
 
-  closeDailySettings();
+  localStorage.setItem(
+    "plan-daily-settings",
+    JSON.stringify({
+      startTime,
+      endTime
+    })
+  );
+
+  // Reload to apply the new timeline range.
+  location.reload();
 }
+
 
 // =====================================
 // DAILY EVENT EDITOR
@@ -1841,30 +1900,36 @@ function openEventForm(startOffset) {
 
   const start = Math.max(
     DAILY_START,
-    Math.min(DAILY_END-15,Math.round(startOffset/15)*15)
+    Math.min(
+      DAILY_END - 15,
+      Math.round(startOffset / 15) * 15
+    )
   );
 
   document.getElementById("eventStart").value = String(start);
+
   document.getElementById("eventEnd").value = String(
-    Math.min(DAILY_END,start+60)
+    Math.min(DAILY_END, start + 60)
   );
 
   document.getElementById("deleteEventButton").style.display = "none";
   document.getElementById("eventEditor").style.display = "block";
 
   document.getElementById("eventEditor").scrollIntoView({
-    behavior:"smooth",
-    block:"nearest"
+    behavior: "smooth",
+    block: "nearest"
   });
 
   setTimeout(() => {
     document.getElementById("eventName").focus();
-  },250);
+  }, 250);
 }
 
 function editDailyEvent(id) {
 
-  const event = getDailyEvents().find(e => Number(e.id)===Number(id));
+  const event = getDailyEvents().find(
+    e => Number(e.id) === Number(id)
+  );
 
   if (!event) return;
 
@@ -1879,8 +1944,8 @@ function editDailyEvent(id) {
   document.getElementById("eventEditor").style.display = "block";
 
   document.getElementById("eventEditor").scrollIntoView({
-    behavior:"smooth",
-    block:"nearest"
+    behavior: "smooth",
+    block: "nearest"
   });
 }
 
@@ -1905,9 +1970,9 @@ function saveDailyEvent() {
   if (
     !Number.isFinite(start) ||
     !Number.isFinite(end) ||
-    start<DAILY_START ||
-    end>DAILY_END ||
-    end<=start
+    start < DAILY_START ||
+    end > DAILY_END ||
+    end <= start
   ) {
     alert("Please select a valid start and end time.");
     return;
@@ -1919,13 +1984,14 @@ function saveDailyEvent() {
   const conflict = events.find(event => {
 
     if (
-      editingEventId!==null &&
-      Number(event.id)===Number(editingEventId)
+      editingEventId !== null &&
+      Number(event.id) === Number(editingEventId)
     ) {
       return false;
     }
 
-    return start<Number(event.end) && end>Number(event.start);
+    return start < Number(event.end) &&
+      end > Number(event.start);
   });
 
   if (conflict) {
@@ -1933,28 +1999,28 @@ function saveDailyEvent() {
     return;
   }
 
-  if (editingEventId!==null) {
+  if (editingEventId !== null) {
 
     const index = events.findIndex(
-      e => Number(e.id)===Number(editingEventId)
+      e => Number(e.id) === Number(editingEventId)
     );
 
-    if (index!==-1) {
+    if (index !== -1) {
       events[index] = {
         ...events[index],
-        title:title,
-        start:start,
-        end:end
+        title: title,
+        start: start,
+        end: end
       };
     }
 
   } else {
 
     events.push({
-      id:Date.now(),
-      title:title,
-      start:start,
-      end:end
+      id: Date.now(),
+      title: title,
+      start: start,
+      end: end
     });
 
   }
@@ -1966,19 +2032,18 @@ function saveDailyEvent() {
 
 function deleteDailyEvent() {
 
-  if (editingEventId===null) return;
+  if (editingEventId === null) return;
 
   if (!confirm("Delete this event?")) return;
 
   dailyData[selectedDailyDate] = getDailyEvents().filter(
-    event => Number(event.id)!==Number(editingEventId)
+    event => Number(event.id) !== Number(editingEventId)
   );
 
   saveDailyData();
   closeEventEditor();
   renderTimeline();
 }
-
 
 // =====================================
 // DAILY ENTER HANDLING
