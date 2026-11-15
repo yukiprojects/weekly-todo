@@ -2021,18 +2021,9 @@ function renderTimeline() {
 
 function updateDailyDateLabel() {
 
-  const date = new Date(selectedDailyDate+"T12:00:00");
-
   document.getElementById("dailyDate").value =
     selectedDailyDate;
 
-  document.getElementById("dailyDateLabel").textContent =
-    date.toLocaleDateString("en-US",{
-      weekday:"long",
-      month:"long",
-      day:"numeric",
-      year:"numeric"
-    }).toUpperCase()+"  ·  YOUR DAY, YOUR PLAN.";
 }
 
 function renderDaily() {
