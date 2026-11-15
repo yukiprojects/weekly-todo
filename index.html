@@ -1827,12 +1827,19 @@ function goToday() {
 }
 
 
+
 // =====================================
 // DAILY SETTINGS
 // =====================================
 
 function openDailySettings() {
   const panel = document.getElementById("dailySettingsPanel");
+
+  // Toggle panel
+  if (panel.style.display === "block") {
+    closeDailySettings();
+    return;
+  }
 
   populateDailyTimeSettings();
 
@@ -1843,6 +1850,18 @@ function openDailySettings() {
 
   document.getElementById("dailyEndTime").value =
     saved.endTime;
+
+  // Center panel on the screen
+  panel.style.position = "fixed";
+  panel.style.top = "50%";
+  panel.style.left = "50%";
+  panel.style.transform = "translate(-50%, -50%)";
+  panel.style.width = "calc(100vw - 40px)";
+  panel.style.maxWidth = "420px";
+  panel.style.maxHeight = "80vh";
+  panel.style.overflowY = "auto";
+  panel.style.zIndex = "9999";
+  panel.style.margin = "0";
 
   panel.style.display = "block";
 }
@@ -1882,9 +1901,9 @@ function saveDailySettings() {
     })
   );
 
-  // Reload to apply the new timeline range.
   location.reload();
 }
+
 
 
 // =====================================
