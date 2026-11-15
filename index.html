@@ -244,7 +244,15 @@ body.dragging {
 
 #daily {
   display:none;
-  padding-bottom:70vh;
+  height:calc(
+    100dvh - 76px -
+    env(safe-area-inset-top) -
+    env(safe-area-inset-bottom)
+  );
+  min-height:0;
+  padding-bottom:0;
+  flex-direction:column;
+  overflow:hidden;
 }
 
 .daily-header { margin-bottom:28px; }
@@ -382,6 +390,16 @@ body.dragging {
   font-size:11px;
   margin-bottom:16px;
   line-height:1.5;
+}
+
+  .daily-scroll-area {
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding-bottom:20px;
 }
 
 .timeline {
