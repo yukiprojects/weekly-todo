@@ -955,14 +955,17 @@ body.dragging {
 <div class="month-topbar">
 
 <div class="brand">
-  <svg class="calendar-icon">...</svg>
-
-  <div>
-    <h1 class="month-title">MONTHLY.</h1>
-    <div class="month-period" id="monthPeriod"></div>
-  </div>
+  <svg class="calendar-icon" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="1.7"
+       stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="5" width="18" height="16" rx="2"/>
+    <path d="M16 3v4M8 3v4M3 10h18"/>
+    <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/>
+  </svg>
+  <h1 class="month-title">MONTHLY.</h1>
 </div>
 
+<div class="month-period" id="monthPeriod"></div>
     <div class="month-intro">
       <h2>Who do I want to become?</h2>
       <p>
