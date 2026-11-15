@@ -1803,6 +1803,18 @@ function closeDailySettings() {
   endSelect.value = "02:00";
 }
 
+  function saveDailySettings() {
+  const startTime = document.getElementById("dailyStartTime").value;
+  const endTime = document.getElementById("dailyEndTime").value;
+
+  localStorage.setItem("plan-daily-settings", JSON.stringify({
+    startTime,
+    endTime
+  }));
+
+  closeDailySettings();
+}
+
 // =====================================
 // DAILY EVENT EDITOR
 // =====================================
