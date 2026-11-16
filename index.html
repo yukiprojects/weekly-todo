@@ -1871,26 +1871,24 @@ function toggle(i) {
 // ADD TASK
 // =====================================
 
-function addTask() {
-
+function addTask(name, important) {
   checkWeekChange();
 
-  const input = document.getElementById("newTask");
-  const name = input.value.trim();
+  name = name.trim();
 
   if (!name) return;
 
-  const task = {name:name,done:false};
+  const task = {
+    name: name,
+    done: false,
+    important: important
+  };
 
   const firstDone = tasks.findIndex(t => t.done);
 
-  if (firstDone===-1) {
-    tasks.push(task);
-  } else {
-    tasks.splice(firstDone,0,task);
-  }
+  if (firstDone === -1) tasks.push(task);
+  else tasks.splice(firstDone, 0, task);
 
-  input.value="";
   render();
   save();
 }
@@ -1900,30 +1898,70 @@ function addTask() {
 // ENTER HANDLING
 // =====================================
 
-const taskInput = document.getElementById("newTask");
+const taskInput = document.getElementById("todoName");
+
 let isTaskInputComposing = false;
 
-taskInput.addEventListener("compositionstart",() => {
+taskInput.addEventListener("compositionstart", () => {
   isTaskInputComposing = true;
 });
 
-taskInput.addEventListener("compositionend",() => {
+taskInput.addEventListener("compositionend", () => {
   isTaskInputComposing = false;
 });
 
-taskInput.addEventListener("keydown",event => {
-
-  if (event.key!=="Enter") return;
+taskInput.addEventListener("keydown", event => {
+  if (event.key !== "Enter") return;
 
   if (
     isTaskInputComposing ||
     event.isComposing ||
-    event.keyCode===229
+    event.keyCode === 229
   ) return;
 
   event.preventDefault();
-  addTask();
+  saveTodo();
 });
+
+
+  // =====================================
+// TODO EDITOR
+// =====================================
+
+function openTodoEditor() {
+  const modal = document.getElementById("todoModal");
+  const input = document.getElementById("todoName");
+  const important = document.getElementById("todoImportant");
+
+  input.value = "";
+  important.checked = false;
+
+  modal.classList.add("open");
+
+  setTimeout(() => {
+    input.focus();
+  }, 100);
+}
+
+function closeTodoEditor() {
+  document.getElementById("todoModal").classList.remove("open");
+}
+
+function saveTodo() {
+  const input = document.getElementById("todoName");
+  const important = document.getElementById("todoImportant");
+
+  const name = input.value.trim();
+
+  if (!name) {
+    input.focus();
+    return;
+  }
+
+  addTask(name, important.checked);
+
+  closeTodoEditor();
+}
 
 
 // =====================================
