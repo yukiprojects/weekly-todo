@@ -173,14 +173,10 @@ h1 {
 
 /* IMPORTANT TASK MARKER */
 
-.task.important {
-  padding-left:12px;
-}
-
 .task.important::before {
   content:"";
   position:absolute;
-  left:0;
+  left:-12px;
   top:50%;
   transform:translateY(-50%);
   width:3px;
