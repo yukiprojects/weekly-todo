@@ -114,11 +114,34 @@ h1 {
 }
 
 .day-date {
-  color:white;
+  color:#777;
   font-size:13px;
   font-weight:600;
 }
 
+.day.today {
+  color:#75d69b;
+}
+
+ .day.today > div:first-child {
+  position:relative;
+}
+
+.day.today > div:first-child::after {
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-6px;
+  transform:translateX(-50%);
+  width:16px;
+  height:3px;
+  background:#75d69b;
+  border-radius:1px;
+} 
+
+.day.today .day-date {
+  color:#75d69b;
+}
 .day-dot {
   width:9px;
   height:9px;
