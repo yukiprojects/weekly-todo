@@ -1822,9 +1822,9 @@ function render() {
 
   document.getElementById("weekdays").innerHTML =
     ["MON","TUE","WED","THU","FRI","SAT","SUN"].map((d,i)=>`
-      <div class="weekday">
-        <div class="weekday-name">${d}</div>
-        <div class="weekday-date">${getWeekDate(i)}</div>
+      <div class="day">
+        <div>${d}</div>
+        <div class="day-date">${formatDate(weekDates[i])}</div>
       </div>
     `).join("");
 
