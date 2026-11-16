@@ -1712,11 +1712,18 @@ function setupDrag() {
       });
 
       if (targetRow) {
-        const targetIndex = Number(targetRow.dataset.index);
-        if (targetIndex!==dragIndex) {
-          targetRow.classList.add("drag-target");
-        }
-      }
+  const targetIndex = Number(targetRow.dataset.index);
+
+  if (targetIndex !== dragIndex) {
+
+    targetRow.classList.add("drag-target");
+
+    if (targetIndex < dragIndex) {
+      targetRow.classList.add("drag-target-above");
+    }
+
+  }
+}
 
     },{passive:false});
 
