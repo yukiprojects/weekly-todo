@@ -2050,8 +2050,10 @@ function render() {
       </div>
     `).join("");
 
-  const activeTasks = tasks.filter(t => !t.done);
-  const finishedTasks = tasks.filter(t => t.done);
+  const allTasks = getActiveTasks();
+
+  const activeTasks = allTasks.filter(t => !t.done);
+  const finishedTasks = allTasks.filter(t => t.done);
 
   document.getElementById("list").innerHTML =
     activeTasks.length===0
@@ -2065,11 +2067,15 @@ function render() {
             <path d="M8 14h3M8 17h5"/>
           </svg>
           <div class="empty-title">No tasks yet</div>
-          <div class="empty-description">Your week is clear. Add a task to get started.</div>
+          <div class="empty-description">
+            ${currentTodoTab === "today"
+              ? "Your day is clear. Add a task to get started."
+              : "Your week is clear. Add a task to get started."}
+          </div>
         </div>
       `
       : activeTasks.map(t => {
-          const i = tasks.indexOf(t);
+          const i = allTasks.indexOf(t);
           return `
             <div class="task ${t.important?"important":""}" data-index="${i}">
               <div class="circle" onclick="toggle(${i})"></div>
@@ -2081,7 +2087,7 @@ function render() {
 
   document.getElementById("finishedList").innerHTML =
     finishedTasks.map(t => {
-      const i = tasks.indexOf(t);
+      const i = allTasks.indexOf(t);
       return `
         <div class="task done" data-index="${i}">
           <div class="circle" onclick="toggle(${i})"></div>
@@ -2092,11 +2098,11 @@ function render() {
     }).join("");
 
   document.getElementById("finishedCount").textContent =
-    `${finishedTasks.length}/${tasks.length} DONE!`;
+    `${finishedTasks.length}/${allTasks.length} DONE!`;
 
   setupDrag();
 }
-
+  
 // =====================================
 // TOGGLE TASK
 // =====================================
