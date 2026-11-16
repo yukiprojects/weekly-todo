@@ -2111,7 +2111,9 @@ function toggle(i) {
 
   checkWeekChange();
 
-  const task = tasks[i];
+  const activeTasks = getActiveTasks();
+  const task = activeTasks[i];
+
   if (!task) return;
 
   task.done = !task.done;
@@ -2122,11 +2124,10 @@ function toggle(i) {
     delete task.completedAt;
   }
 
-  sortTasks();
+  sortActiveTasks();
   render();
-  save();
+  saveActiveTasks();
 }
-
 
 // =====================================
 // ADD TASK
@@ -2139,21 +2140,23 @@ function addTask(name, important) {
 
   if (!name) return;
 
+  const activeTasks = getActiveTasks();
+
   const task = {
     name: name,
     done: false,
     important: important
   };
 
-  const firstDone = tasks.findIndex(t => t.done);
+  const firstDone = activeTasks.findIndex(t => t.done);
 
-  if (firstDone === -1) tasks.push(task);
-  else tasks.splice(firstDone, 0, task);
+  if (firstDone === -1) activeTasks.push(task);
+  else activeTasks.splice(firstDone, 0, task);
 
-  sortTasks();
+  sortActiveTasks();
 
   render();
-  save();
+  saveActiveTasks();
 }
 
 
@@ -2235,11 +2238,14 @@ function removeTask(i) {
 
   checkWeekChange();
 
-  if (i<0 || i>=tasks.length) return;
+  const activeTasks = getActiveTasks();
 
-  tasks.splice(i,1);
+  if (i<0 || i>=activeTasks.length) return;
+
+  activeTasks.splice(i,1);
+
   render();
-  save();
+  saveActiveTasks();
 }
 
 
