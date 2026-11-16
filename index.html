@@ -2266,6 +2266,7 @@ function saveDailySettings() {
 
 
 
+
 // =====================================
 // DAILY EVENT EDITOR
 // =====================================
@@ -2292,17 +2293,15 @@ function openEventForm(startOffset) {
   );
 
   document.getElementById("deleteEventButton").style.display = "none";
-  document.getElementById("eventEditor").style.display = "block";
 
-  document.getElementById("eventEditor").scrollIntoView({
-    behavior: "smooth",
-    block: "nearest"
-  });
+  // Open modal
+  document.getElementById("eventModal").style.display = "flex";
 
   setTimeout(() => {
     document.getElementById("eventName").focus();
   }, 250);
 }
+
 
 function editDailyEvent(id) {
 
@@ -2320,18 +2319,20 @@ function editDailyEvent(id) {
   document.getElementById("eventEnd").value = String(event.end);
 
   document.getElementById("deleteEventButton").style.display = "block";
-  document.getElementById("eventEditor").style.display = "block";
 
-  document.getElementById("eventEditor").scrollIntoView({
-    behavior: "smooth",
-    block: "nearest"
-  });
+  // Open modal
+  document.getElementById("eventModal").style.display = "flex";
 }
+
 
 function closeEventEditor() {
-  document.getElementById("eventEditor").style.display = "none";
+
+  // Close modal
+  document.getElementById("eventModal").style.display = "none";
+
   editingEventId = null;
 }
+
 
 function saveDailyEvent() {
 
@@ -2409,6 +2410,7 @@ function saveDailyEvent() {
   renderTimeline();
 }
 
+
 function deleteDailyEvent() {
 
   if (editingEventId === null) return;
@@ -2423,6 +2425,7 @@ function deleteDailyEvent() {
   closeEventEditor();
   renderTimeline();
 }
+
 
 // =====================================
 // DAILY ENTER HANDLING
