@@ -1830,7 +1830,7 @@ function render() {
     ["MON","TUE","WED","THU","FRI","SAT","SUN"].map((d,i)=>`
       <div class="day">
         <div>${d}</div>
-        <div class="day-date">${formatDate(weekDates[i])}</div>
+        <div class="day-date">${weekDates[i].getDate()}</div>
       </div>
     `).join("");
 
