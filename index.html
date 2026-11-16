@@ -1828,7 +1828,7 @@ function render() {
 
   document.getElementById("weekdays").innerHTML =
     ["MON","TUE","WED","THU","FRI","SAT","SUN"].map((d,i)=>`
-      <div class="day">
+      <div class="day ${weekDates[i].toDateString()===new Date().toDateString()?"today":""}">
         <div>${d}</div>
         <div class="day-date">${weekDates[i].getDate()}</div>
       </div>
