@@ -1365,8 +1365,19 @@ select {
 
 <!-- TODO TABS -->
 <div class="todo-tabs">
-  <button class="todo-tab active" type="button">TODAY</button>
-  <button class="todo-tab" type="button">WEEK</button>
+  <button
+    class="todo-tab active"
+    id="todayTab"
+    type="button"
+    onclick="switchTodoTab('today')"
+  >TODAY</button>
+
+  <button
+    class="todo-tab"
+    id="weekTab"
+    type="button"
+    onclick="switchTodoTab('week')"
+  >WEEK</button>
 </div>
 
 <div class="section">TO DO LIST</div>
