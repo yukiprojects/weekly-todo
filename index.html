@@ -115,6 +115,7 @@ h1 {
 }
 
 .day-date {
+  position:relative;
   color:#777;
   font-size:13px;
   font-weight:600;
@@ -125,7 +126,7 @@ h1 {
   color:#fff;
 }
 
-.day.today::after {
+.day.today .day-date::after {
   content:"";
   position:absolute;
   left:50%;
