@@ -20,6 +20,7 @@
 <style>
 * { box-sizing:border-box; }
 
+
 body {
   margin:0;
   padding:38px 24px;
@@ -76,10 +77,25 @@ h1 {
   margin-top:6px;
 }
 
-.progress {
-  color:#75d69b;
-  font-size:12px;
+/* WEEKLY ADD BUTTON */
+
+.weekly-add-button {
+  width:38px;
+  height:38px;
+  padding:0;
+  border-radius:50%;
+  background:#75d69b;
+  color:#111;
+  font-size:27px;
+  font-weight:400;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
 }
+
+/* WEEKDAYS */
 
 .weekdays {
   display:flex;
@@ -112,12 +128,16 @@ h1 {
 
 .day-dot.active { background:#75d69b; }
 
+/* SECTION */
+
 .section {
   color:#888;
   font-size:11px;
   letter-spacing:1.5px;
   margin:38px 0 22px;
 }
+
+/* TASK */
 
 .task {
   display:flex;
@@ -150,12 +170,29 @@ h1 {
 
 .task-name { flex:1; }
 
+/* IMPORTANT TASK MARKER */
+
+.task.important::before {
+  content:"";
+  position:absolute;
+  left:-12px;
+  top:50%;
+  transform:translateY(-50%);
+  width:3px;
+  height:65%;
+  min-height:15px;
+  border-radius:3px;
+  background:#75d69b;
+}
+
 .remove {
   color:#777;
   font-size:22px;
   padding:0 5px;
   cursor:pointer;
 }
+
+/* EMPTY STATE */
 
 .empty-state {
   display:flex;
@@ -186,6 +223,8 @@ h1 {
   font-size:13px;
 }
 
+/* INPUT */
+
 .add-area {
   display:flex;
   gap:8px;
@@ -213,6 +252,189 @@ button {
   font-weight:600;
   cursor:pointer;
 }
+
+/* WEEKLY TODO MODAL */
+
+.todo-modal {
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:rgba(0,0,0,.68);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  box-sizing:border-box;
+}
+
+.todo-modal.open {
+  display:flex;
+  animation:todoFadeIn .18s ease;
+}
+
+.todo-editor {
+  width:100%;
+  max-width:420px;
+  box-sizing:border-box;
+  background:#1b1b1b;
+  border:1px solid #383838;
+  border-radius:16px;
+  padding:22px;
+  animation:todoSlideIn .22s ease;
+}
+
+.todo-editor-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:25px;
+}
+
+.todo-editor-title {
+  font-size:16px;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+
+.todo-close-button {
+  width:30px;
+  height:30px;
+  padding:0;
+  background:transparent;
+  color:#888;
+  font-size:26px;
+  font-weight:300;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.todo-input {
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  margin-top:9px;
+  background:#252525;
+  border:1px solid #444;
+  border-radius:9px;
+  padding:14px;
+  color:white;
+  font-size:16px;
+  outline:none;
+}
+
+.todo-input:focus {
+  border-color:#75d69b;
+}
+
+.todo-important-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-top:25px;
+  padding:17px 0;
+  border-top:1px solid #333;
+  border-bottom:1px solid #333;
+}
+
+.todo-important-label {
+  min-width:0;
+}
+
+.todo-important-title {
+  color:#eee;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:1px;
+}
+
+.todo-important-description {
+  color:#777;
+  font-size:11px;
+  margin-top:6px;
+}
+
+/* IMPORTANT SWITCH */
+
+.todo-switch {
+  position:relative;
+  display:block;
+  width:46px;
+  height:26px;
+  flex-shrink:0;
+}
+
+.todo-switch input {
+  opacity:0;
+  width:0;
+  height:0;
+  margin:0;
+}
+
+.todo-switch-slider {
+  position:absolute;
+  inset:0;
+  background:#444;
+  border-radius:20px;
+  transition:background .2s;
+  cursor:pointer;
+}
+
+.todo-switch-slider::before {
+  content:"";
+  position:absolute;
+  width:20px;
+  height:20px;
+  left:3px;
+  top:3px;
+  background:#ddd;
+  border-radius:50%;
+  transition:transform .2s;
+}
+
+.todo-switch input:checked + .todo-switch-slider {
+  background:#75d69b;
+}
+
+.todo-switch input:checked + .todo-switch-slider::before {
+  transform:translateX(20px);
+  background:#111;
+}
+
+.todo-save-button {
+  display:block;
+  width:100%;
+  height:48px;
+  margin-top:22px;
+  padding:0;
+  border-radius:9px;
+  background:#75d69b;
+  color:#111;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+/* MODAL ANIMATION */
+
+@keyframes todoFadeIn {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+
+@keyframes todoSlideIn {
+  from {
+    opacity:0;
+    transform:translateY(12px);
+  }
+  to {
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* DRAG AND DROP */
 
 .task.dragging { opacity:.35; }
 
@@ -242,6 +464,8 @@ button {
 body.dragging {
   user-select:none;
   -webkit-user-select:none;
+}
+
 }
 
 /* =====================================
