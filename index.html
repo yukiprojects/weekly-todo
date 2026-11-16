@@ -1906,6 +1906,51 @@ function saveTodayTasks() {
 }
 
 saveTodayTasks();
+
+
+// =====================================
+// TODO TAB CONTROL
+// =====================================
+
+let currentTodoTab = "today";
+
+function getActiveTasks() {
+  return currentTodoTab === "today"
+    ? todayTasks
+    : tasks;
+}
+
+function sortActiveTasks() {
+  if (currentTodoTab === "today") {
+    sortTodayTasks();
+  } else {
+    sortTasks();
+  }
+}
+
+function saveActiveTasks() {
+  if (currentTodoTab === "today") {
+    saveTodayTasks();
+  } else {
+    save();
+  }
+}
+
+function switchTodoTab(tab) {
+  if (tab !== "today" && tab !== "week") return;
+
+  currentTodoTab = tab;
+
+  document.getElementById("todayTab")
+    .classList.toggle("active",tab === "today");
+
+  document.getElementById("weekTab")
+    .classList.toggle("active",tab === "week");
+
+  render();
+}
+
+  
 // =====================================
 // AUTOMATIC WEEK UPDATE
 // =====================================
