@@ -1833,6 +1833,68 @@ function save() {
 
 save();
 
+
+  // =====================================
+// TODAY TASK DATA
+// =====================================
+
+const TODAY_STORAGE_KEY = "today-todo-data";
+
+let todayTasks = [];
+let savedTodayDate = dateKey(new Date());
+
+try {
+  const storedToday = localStorage.getItem(TODAY_STORAGE_KEY);
+
+  if (storedToday) {
+    const data = JSON.parse(storedToday);
+
+    todayTasks = Array.isArray(data.tasks)
+      ? data.tasks
+      : [];
+
+    savedTodayDate = data.date || savedTodayDate;
+  }
+} catch(e) {
+  console.error("Today data loading error:",e);
+}
+
+// 日付が変わっていたら完了済みだけ削除
+if (savedTodayDate !== dateKey(new Date())) {
+  todayTasks = todayTasks.filter(t => !t.done);
+
+  todayTasks.forEach(t => delete t.completedAt);
+
+  savedTodayDate = dateKey(new Date());
+}
+
+function sortTodayTasks() {
+  todayTasks = [
+    ...todayTasks.filter(t => !t.done && t.important),
+    ...todayTasks.filter(t => !t.done && !t.important),
+    ...todayTasks.filter(t => t.done)
+  ];
+}
+
+sortTodayTasks();
+
+function saveTodayTasks() {
+  try {
+    localStorage.setItem(
+      TODAY_STORAGE_KEY,
+      JSON.stringify({
+        date: savedTodayDate,
+        tasks: todayTasks
+      })
+    );
+  } catch(e) {
+    console.error("Today data saving error:",e);
+    alert("Could not save Today tasks.");
+  }
+}
+
+saveTodayTasks();
+
 // =====================================
 // AUTOMATIC WEEK UPDATE
 // =====================================
