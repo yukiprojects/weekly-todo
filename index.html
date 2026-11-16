@@ -1952,8 +1952,10 @@ function switchTodoTab(tab) {
 
   
 // =====================================
-// AUTOMATIC WEEK UPDATE
+// AUTOMATIC WEEK & TODAY UPDATE
 // =====================================
+
+// WEEK UPDATE
 
 let weekCheckTimer = null;
 
@@ -1989,15 +1991,71 @@ function scheduleNextWeekCheck() {
   );
 }
 
+
+// TODAY UPDATE
+
+let todayCheckTimer = null;
+
+function checkTodayChange() {
+
+  const latestDate = dateKey(new Date());
+
+  if (latestDate !== savedTodayDate) {
+
+    todayTasks = todayTasks.filter(t => !t.done);
+
+    todayTasks.forEach(t => delete t.completedAt);
+
+    savedTodayDate = latestDate;
+
+    sortTodayTasks();
+    saveTodayTasks();
+    render();
+  }
+
+  scheduleNextDayCheck();
+}
+
+function scheduleNextDayCheck() {
+
+  clearTimeout(todayCheckTimer);
+
+  const now = new Date();
+  const tomorrow = new Date(now);
+
+  tomorrow.setDate(tomorrow.getDate()+1);
+  tomorrow.setHours(0,0,0,0);
+
+  todayCheckTimer = setTimeout(
+    checkTodayChange,
+    tomorrow.getTime()-now.getTime()
+  );
+}
+
+
+// CHECK WHEN APP RETURNS
+
 document.addEventListener("visibilitychange",() => {
-  if (!document.hidden) checkWeekChange();
+
+  if (!document.hidden) {
+    checkWeekChange();
+    checkTodayChange();
+  }
+
 });
 
 window.addEventListener("pageshow",() => {
+
   checkWeekChange();
+  checkTodayChange();
+
 });
 
+
+// START TIMERS
+
 scheduleNextWeekCheck();
+scheduleNextDayCheck();
 
 
 // =====================================
