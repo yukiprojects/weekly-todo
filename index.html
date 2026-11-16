@@ -170,13 +170,16 @@ h1 {
 
 .task-name { flex:1; }
 
-
 /* IMPORTANT TASK MARKER */
+
+.task {
+  position:relative;
+}
 
 .task.important::before {
   content:"";
   position:absolute;
-  left:-12px;
+  left:0;
   top:50%;
   transform:translateY(-50%);
   width:3px;
@@ -184,6 +187,7 @@ h1 {
   min-height:15px;
   border-radius:3px;
   background:#75d69b;
+  pointer-events:none;
 }
 
 
