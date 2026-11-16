@@ -125,14 +125,11 @@ h1 {
   color:#fff;
 }
 
-.day.today {
-  position:relative;
-}
-
 .day.today::after {
   content:"";
   position:absolute;
-  left:-10px;
+  left:50%;
+  transform:translateX(-50%);
   bottom:-9px;
   width:calc(100% + 20px);
   height:3px;
