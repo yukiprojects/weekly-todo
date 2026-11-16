@@ -1863,8 +1863,11 @@ function render() {
       </div>
     `).join("");
 
+  const activeTasks = tasks.filter(t => !t.done);
+  const finishedTasks = tasks.filter(t => t.done);
+
   document.getElementById("list").innerHTML =
-    tasks.length===0
+    activeTasks.length===0
       ? `
         <div class="empty-state">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none"
@@ -1878,13 +1881,31 @@ function render() {
           <div class="empty-description">Your week is clear. Add a task to get started.</div>
         </div>
       `
-      : tasks.map((t,i)=>`
-        <div class="task ${t.done?"done":""} ${t.important?"important":""}" data-index="${i}">
+      : activeTasks.map(t => {
+          const i = tasks.indexOf(t);
+          return `
+            <div class="task ${t.important?"important":""}" data-index="${i}">
+              <div class="circle" onclick="toggle(${i})"></div>
+              <span class="task-name">${escapeHTML(t.name)}</span>
+              <span class="remove" onclick="removeTask(${i})">×</span>
+            </div>
+          `;
+        }).join("");
+
+  document.getElementById("finishedList").innerHTML =
+    finishedTasks.map(t => {
+      const i = tasks.indexOf(t);
+      return `
+        <div class="task done" data-index="${i}">
           <div class="circle" onclick="toggle(${i})"></div>
           <span class="task-name">${escapeHTML(t.name)}</span>
           <span class="remove" onclick="removeTask(${i})">×</span>
         </div>
-      `).join("");
+      `;
+    }).join("");
+
+  document.getElementById("finishedCount").textContent =
+    `${finishedTasks.length}/${tasks.length} DONE!`;
 
   setupDrag();
 }
