@@ -1041,6 +1041,7 @@ select {
      PAGE : WEEKLY (MAIN)
 ===================================== -->
 
+
 <div class="page" id="weekly">
 
 <header>
@@ -1057,7 +1058,12 @@ select {
       <div class="sub" id="period"></div>
     </div>
   </div>
-  <div class="progress" id="progress"></div>
+
+  <button
+    class="weekly-add-button"
+    onclick="openTodoEditor()"
+    aria-label="Add new todo"
+  >+</button>
 </header>
 
 <div class="weekdays" id="weekdays"></div>
@@ -1065,9 +1071,57 @@ select {
 <div class="section">TO DO LIST</div>
 <div id="list"></div>
 
-<div class="add-area">
-  <input id="newTask" placeholder="New task..." enterkeyhint="done"/>
-  <button onclick="addTask()">＋</button>
+<!-- WEEKLY TODO EDITOR MODAL -->
+<div
+  class="todo-modal"
+  id="todoModal"
+  onclick="closeTodoEditor()"
+>
+  <div
+    class="todo-editor"
+    onclick="event.stopPropagation()"
+  >
+
+    <div class="todo-editor-header">
+      <div class="todo-editor-title">NEW TODO</div>
+      <button
+        class="todo-close-button"
+        onclick="closeTodoEditor()"
+        aria-label="Close"
+      >×</button>
+    </div>
+
+    <div class="editor-label">TASK TITLE</div>
+
+    <input
+      id="todoName"
+      class="todo-input"
+      placeholder="What do you need to do?"
+      maxlength="100"
+    />
+
+    <div class="todo-important-row">
+
+      <div class="todo-important-label">
+        <div class="todo-important-title">IMPORTANT</div>
+        <div class="todo-important-description">
+          Highlight this task in Weekly Todo
+        </div>
+      </div>
+
+      <label class="todo-switch">
+        <input type="checkbox" id="todoImportant">
+        <span class="todo-switch-slider"></span>
+      </label>
+
+    </div>
+
+    <button
+      class="todo-save-button"
+      onclick="saveTodo()"
+    >SAVE</button>
+
+  </div>
 </div>
 
 </div>
