@@ -1146,10 +1146,19 @@ select {
 
   </div>
 
-  <!-- DAILY EVENT MODAL -->
-  <div class="event-modal" id="eventModal">
 
-    <div class="event-editor" id="eventEditor">
+  <!-- DAILY EVENT MODAL -->
+  <div
+    class="event-modal"
+    id="eventModal"
+    onclick="closeEventEditor()"
+  >
+
+    <div
+      class="event-editor"
+      id="eventEditor"
+      onclick="event.stopPropagation()"
+    >
 
       <div class="editor-title" id="editorTitle">NEW EVENT</div>
 
