@@ -2563,6 +2563,17 @@ function goToday() {
   });
 }
 
+function updateDailyDateStyle() {
+  const input = document.getElementById("dailyDate");
+
+  if (!input) return;
+
+  input.classList.toggle(
+    "today",
+    selectedDailyDate === dateKey(new Date())
+  );
+}
+
 
 
 
