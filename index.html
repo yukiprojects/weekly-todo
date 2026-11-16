@@ -1784,6 +1784,7 @@ function dateKey(date) {
 // =====================================
 
 const STORAGE_KEY = "weekly-todo-data";
+const TODAY_STORAGE_KEY = "today-todo-data";
 
 function getMonday(date) {
   const monday = new Date(date);
@@ -1794,6 +1795,7 @@ function getMonday(date) {
 }
 
 let currentWeekStart = dateKey(getMonday(new Date()));
+
 let tasks = [];
 let savedWeekStart = currentWeekStart;
 
@@ -1821,11 +1823,13 @@ if (savedWeekStart !== currentWeekStart) {
 }
 
 function sortTasks() {
-  tasks = [
+  const sorted = [
     ...tasks.filter(t => !t.done && t.important),
     ...tasks.filter(t => !t.done && !t.important),
     ...tasks.filter(t => t.done)
   ];
+
+  tasks.splice(0,tasks.length,...sorted);
 }
 
 sortTasks();
@@ -1845,11 +1849,9 @@ function save() {
 save();
 
 
-  // =====================================
+// =====================================
 // TODAY TASK DATA
 // =====================================
-
-const TODAY_STORAGE_KEY = "today-todo-data";
 
 let todayTasks = [];
 let savedTodayDate = dateKey(new Date());
@@ -1870,21 +1872,20 @@ try {
   console.error("Today data loading error:",e);
 }
 
-// 日付が変わっていたら完了済みだけ削除
 if (savedTodayDate !== dateKey(new Date())) {
   todayTasks = todayTasks.filter(t => !t.done);
-
   todayTasks.forEach(t => delete t.completedAt);
-
   savedTodayDate = dateKey(new Date());
 }
 
 function sortTodayTasks() {
-  todayTasks = [
+  const sorted = [
     ...todayTasks.filter(t => !t.done && t.important),
     ...todayTasks.filter(t => !t.done && !t.important),
     ...todayTasks.filter(t => t.done)
   ];
+
+  todayTasks.splice(0,todayTasks.length,...sorted);
 }
 
 sortTodayTasks();
@@ -1894,8 +1895,8 @@ function saveTodayTasks() {
     localStorage.setItem(
       TODAY_STORAGE_KEY,
       JSON.stringify({
-        date: savedTodayDate,
-        tasks: todayTasks
+        date:savedTodayDate,
+        tasks:todayTasks
       })
     );
   } catch(e) {
@@ -1905,7 +1906,6 @@ function saveTodayTasks() {
 }
 
 saveTodayTasks();
-
 // =====================================
 // AUTOMATIC WEEK UPDATE
 // =====================================
