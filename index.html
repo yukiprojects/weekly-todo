@@ -1749,7 +1749,13 @@ if (savedWeekStart !== currentWeekStart) {
   savedWeekStart = currentWeekStart;
 }
 
-function sortTasks(
+function sortTasks() {
+  tasks = [
+    ...tasks.filter(t => !t.done && t.important),
+    ...tasks.filter(t => !t.done && !t.important),
+    ...tasks.filter(t => t.done)
+  ];
+}
 
 sortTasks();
 
@@ -1766,7 +1772,6 @@ function save() {
 }
 
 save();
-
 
 // =====================================
 // AUTOMATIC WEEK UPDATE
