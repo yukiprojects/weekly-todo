@@ -233,6 +233,12 @@ button {
   pointer-events:none;
 }
 
+/* Dragging upward */
+.task.drag-target.drag-target-above::after {
+  top:0;
+  transform:translateY(-10px);
+}
+
 body.dragging {
   user-select:none;
   -webkit-user-select:none;
