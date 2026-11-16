@@ -2292,14 +2292,14 @@ function setupDrag() {
       const touch = e.touches[0];
 
       if (!dragStarted) {
-  if (
-    Math.abs(touch.clientY-startY)>10 ||
-    Math.abs(touch.clientX-swipeStartX)>10
-  ) {
-    clearTimeout(pressTimer);
-  }
-  return;
-}
+        if (
+          Math.abs(touch.clientY-startY)>10 ||
+          Math.abs(touch.clientX-swipeStartX)>10
+        ) {
+          clearTimeout(pressTimer);
+        }
+        return;
+      }
 
       e.preventDefault();
 
@@ -2314,18 +2314,18 @@ function setupDrag() {
       });
 
       if (targetRow) {
-  const targetIndex = Number(targetRow.dataset.index);
+        const targetIndex = Number(targetRow.dataset.index);
 
-  if (targetIndex !== dragIndex) {
+        if (targetIndex !== dragIndex) {
 
-    targetRow.classList.add("drag-target");
+          targetRow.classList.add("drag-target");
 
-    if (targetIndex < dragIndex) {
-      targetRow.classList.add("drag-target-above");
-    }
+          if (targetIndex < dragIndex) {
+            targetRow.classList.add("drag-target-above");
+          }
 
-  }
-}
+        }
+      }
 
     },{passive:false});
 
@@ -2346,23 +2346,25 @@ function setupDrag() {
 
       const targetRow = target ? target.closest(".task") : null;
 
+      const activeTasks = getActiveTasks();
+
       if (targetRow) {
 
         const targetIndex = Number(targetRow.dataset.index);
 
         if (
           targetIndex!==dragIndex &&
-          tasks[dragIndex] &&
-          tasks[targetIndex] &&
-          tasks[dragIndex].done===tasks[targetIndex].done
+          activeTasks[dragIndex] &&
+          activeTasks[targetIndex] &&
+          activeTasks[dragIndex].done===activeTasks[targetIndex].done
         ) {
 
-          const moved = tasks.splice(dragIndex,1)[0];
+          const moved = activeTasks.splice(dragIndex,1)[0];
 
-          tasks.splice(targetIndex,0,moved);
+          activeTasks.splice(targetIndex,0,moved);
 
-          sortTasks();
-          save();
+          sortActiveTasks();
+          saveActiveTasks();
         }
       }
 
@@ -2391,7 +2393,7 @@ function setupDrag() {
   });
 }
 
-
+  
 // =====================================
 // DAILY DATA
 // =====================================
