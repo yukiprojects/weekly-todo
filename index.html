@@ -123,20 +123,19 @@ h1 {
   color:#75d69b;
 }
 
- .day.today > div:first-child {
+.day.today .day-date {
   position:relative;
 }
 
-.day.today > div:first-child::after {
+.day.today .day-date::after {
   content:"";
   position:absolute;
-  left:50%;
+  left:0;
   bottom:-6px;
-  transform:translateX(-50%);
-  width:16px;
+  width:100%;
   height:3px;
   background:#75d69b;
-  border-radius:1px;
+  border-radius:0;
 } 
 
 .day.today .day-date {
