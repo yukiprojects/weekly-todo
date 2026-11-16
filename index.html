@@ -1749,12 +1749,7 @@ if (savedWeekStart !== currentWeekStart) {
   savedWeekStart = currentWeekStart;
 }
 
-function sortTasks() {
-  tasks = [
-    ...tasks.filter(t => !t.done),
-    ...tasks.filter(t => t.done)
-  ];
-}
+function sortTasks(
 
 sortTasks();
 
