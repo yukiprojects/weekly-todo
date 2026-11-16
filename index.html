@@ -1966,6 +1966,8 @@ function addTask(name, important) {
   if (firstDone === -1) tasks.push(task);
   else tasks.splice(firstDone, 0, task);
 
+  sortTasks();
+
   render();
   save();
 }
