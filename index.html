@@ -2408,7 +2408,7 @@ function startInlineEdit(row) {
 
   row.classList.add("editing");
 
-  input.dataset.originalValue = task.name;
+  let cancelled = false;
 
   input.addEventListener("keydown", event => {
 
@@ -2425,8 +2425,7 @@ function startInlineEdit(row) {
 
       event.preventDefault();
 
-      task.name = input.dataset.originalValue;
-
+      cancelled = true;
       render();
 
     }
@@ -2435,19 +2434,19 @@ function startInlineEdit(row) {
 
   input.addEventListener("blur", () => {
 
+    if (cancelled) return;
+
     const newName = input.value.trim();
 
-    task.name = newName || input.dataset.originalValue;
+    task.name = newName || task.name;
 
     saveActiveTasks();
     render();
 
   });
 
-  // Focus is handled on touchend
   row._editingInput = input;
 }
-
 
 // DRAG SETUP
 
