@@ -23,13 +23,15 @@
 
 body {
   margin:0;
-  padding:38px 24px;
+  padding:38px clamp(12px, 5vw, 24px);
   padding-top:calc(38px + env(safe-area-inset-top));
   padding-bottom:calc(38px + env(safe-area-inset-bottom));
   background:#111;
   color:white;
   font-family:-apple-system,sans-serif;
   overflow-x:hidden;
+  width:100%;
+  max-width:100%;
 }
 
 button,input,textarea,select { font-family:inherit; }
