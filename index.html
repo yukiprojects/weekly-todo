@@ -2050,13 +2050,6 @@ function getWeekDates() {
 
 let weekDates = getWeekDates();
 
-function formatDate(date) {
-  return date.toLocaleDateString("en-US",{
-    month:"short",
-    day:"numeric"
-  });
-}
-
 function updateWeekDisplay() {
 
   weekDates = getWeekDates();
