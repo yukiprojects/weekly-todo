@@ -2158,8 +2158,22 @@ function render() {
       `;
     }).join("");
 
-  document.getElementById("finishedCount").textContent =
-    `${finishedTasks.length}/${allTasks.length} DONE!`;
+  const finishedCountElement =
+  document.getElementById("finishedCount");
+
+const allCompleted =
+  allTasks.length > 0 &&
+  finishedTasks.length === allTasks.length;
+
+finishedCountElement.textContent =
+  allCompleted
+    ? "CONGRATS!"
+    : `${finishedTasks.length}/${allTasks.length} DONE!`;
+
+finishedCountElement.classList.toggle(
+  "congrats",
+  allCompleted
+);
 
   setupDrag();
 }
