@@ -2369,7 +2369,6 @@ function removeTask(i) {
 
 let dragIndex = null;
 let dragStarted = false;
-
 let pressTimer = null;
 
 let startY = 0;
@@ -2416,9 +2415,9 @@ function setupDrag() {
 
     row.addEventListener("touchmove", e => {
 
-      if (!dragStarted) {
+      const touch = e.touches[0];
 
-        const touch = e.touches[0];
+      if (!dragStarted) {
 
         if (
           Math.abs(touch.clientY - startY) > 10 ||
@@ -2432,8 +2431,6 @@ function setupDrag() {
 
       e.preventDefault();
 
-      const touch = e.touches[0];
-
       const target = document.elementFromPoint(
         touch.clientX,
         touch.clientY
@@ -2444,10 +2441,12 @@ function setupDrag() {
         : null;
 
       document.querySelectorAll(".task").forEach(r => {
+
         r.classList.remove(
           "drag-target",
           "drag-target-above"
         );
+
       });
 
       if (targetRow) {
@@ -2471,51 +2470,77 @@ function setupDrag() {
 
     row.addEventListener("touchend", e => {
 
-  clearTimeout(pressTimer);
+      clearTimeout(pressTimer);
 
-  if (!dragStarted) {
-    dragIndex = null;
-    return;
-  }
+      if (!dragStarted) {
 
-  // Get the row currently showing the green line
-  const targetRow = document.querySelector(
-    ".task.drag-target"
-  );
+        dragIndex = null;
 
-  const activeTasks = getActiveTasks();
+        return;
+      }
 
-  if (targetRow) {
+      const touch = e.changedTouches[0];
 
-    const targetIndex = Number(targetRow.dataset.index);
+      const target = document.elementFromPoint(
+        touch.clientX,
+        touch.clientY
+      );
 
-    if (
-      targetIndex !== dragIndex &&
-      activeTasks[dragIndex] &&
-      activeTasks[targetIndex] &&
-      activeTasks[dragIndex].done ===
-      activeTasks[targetIndex].done
-    ) {
+      const targetRow = target
+        ? target.closest(".task")
+        : null;
 
-      const moved = activeTasks.splice(dragIndex, 1)[0];
+      const activeTasks = getActiveTasks();
 
-      activeTasks.splice(targetIndex, 0, moved);
+      if (targetRow) {
 
-      sortActiveTasks();
-      saveActiveTasks();
+        const targetIndex = Number(targetRow.dataset.index);
 
-    }
+        if (
+          targetIndex !== dragIndex &&
+          activeTasks[dragIndex] &&
+          activeTasks[targetIndex] &&
+          activeTasks[dragIndex].done ===
+          activeTasks[targetIndex].done
+        ) {
 
-  }
+          const moved = activeTasks.splice(dragIndex, 1)[0];
 
-  dragIndex = null;
-  dragStarted = false;
+          activeTasks.splice(targetIndex, 0, moved);
 
-  document.body.classList.remove("dragging");
+          sortActiveTasks();
+          saveActiveTasks();
 
-  render();
+        }
 
-}, { passive: true });
+      }
+
+      dragIndex = null;
+      dragStarted = false;
+
+      document.body.classList.remove("dragging");
+
+      render();
+
+    }, { passive: true });
+
+
+    row.addEventListener("touchcancel", () => {
+
+      clearTimeout(pressTimer);
+
+      document.body.classList.remove("dragging");
+
+      dragIndex = null;
+      dragStarted = false;
+
+      render();
+
+    });
+
+  });
+
+}
   
 // =====================================
 // DAILY DATA
