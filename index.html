@@ -2478,11 +2478,9 @@ function setupDrag() {
       clearTimeout(pressTimer);
       clearTimeout(editTimer);
 
-      // 300ms: Ready for dragging
+      // 300ms: Enable dragging
       pressTimer = setTimeout(() => {
-
         dragReady = true;
-
       }, 300);
 
       // 800ms: Start inline editing
@@ -2494,7 +2492,7 @@ function setupDrag() {
 
       }, 800);
 
-    }, {passive:true});
+    }, { passive: true });
 
 
     row.addEventListener("touchmove", e => {
@@ -2506,7 +2504,7 @@ function setupDrag() {
       const moveY = Math.abs(touch.clientY - startY);
       const moveX = Math.abs(touch.clientX - startX);
 
-      // Cancel long press if moved before 300ms
+      // Movement before 300ms cancels long press
       if (!dragReady) {
 
         if (moveY > 10 || moveX > 10) {
@@ -2517,8 +2515,11 @@ function setupDrag() {
         return;
       }
 
-      // Start dragging after movement
-      if (!dragStarted && (moveY > 10 || moveX > 10)) {
+      // Start dragging only after intentional movement
+      if (
+        !dragStarted &&
+        (moveY > 15 || moveX > 20)
+      ) {
 
         clearTimeout(editTimer);
 
@@ -2529,6 +2530,7 @@ function setupDrag() {
 
       }
 
+      // No green line before dragging starts
       if (!dragStarted) return;
 
       e.preventDefault();
@@ -2565,7 +2567,7 @@ function setupDrag() {
 
       }
 
-    }, {passive:false});
+    }, { passive: false });
 
 
     row.addEventListener("touchend", e => {
@@ -2650,7 +2652,7 @@ function setupDrag() {
 
       render();
 
-    }, {passive:true});
+    }, { passive: true });
 
 
     row.addEventListener("touchcancel", () => {
@@ -2659,10 +2661,8 @@ function setupDrag() {
       clearTimeout(editTimer);
 
       if (dragStarted) {
-
         document.body.classList.remove("dragging");
         render();
-
       }
 
       dragIndex = null;
