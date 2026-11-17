@@ -2362,14 +2362,94 @@ function removeTask(i) {
 }
 
 
+
 // =====================================
-// DRAG AND DROP
+// DRAG AND DROP + INLINE EDITING
 // =====================================
 
 let dragIndex = null;
 let dragStarted = false;
+let dragReady = false;
+let editTriggered = false;
+
 let pressTimer = null;
+let editTimer = null;
+
 let startY = 0;
+let startX = 0;
+
+
+// INLINE EDIT
+
+function startInlineEdit(row) {
+
+  const index = Number(row.dataset.index);
+  const activeTasks = getActiveTasks();
+  const task = activeTasks[index];
+
+  if (!task) return;
+
+  const nameElement = row.querySelector(".task-name");
+
+  if (!nameElement) return;
+
+  editTriggered = true;
+
+  clearTimeout(pressTimer);
+  clearTimeout(editTimer);
+
+  const input = document.createElement("input");
+
+  input.type = "text";
+  input.className = "task-name editing";
+  input.value = task.name;
+
+  nameElement.replaceWith(input);
+
+  row.classList.add("editing");
+
+  input.dataset.originalValue = task.name;
+
+  input.addEventListener("keydown", event => {
+
+    if (event.key === "Enter") {
+
+      if (event.isComposing || event.keyCode === 229) return;
+
+      event.preventDefault();
+      input.blur();
+
+    }
+
+    if (event.key === "Escape") {
+
+      event.preventDefault();
+
+      task.name = input.dataset.originalValue;
+
+      render();
+
+    }
+
+  });
+
+  input.addEventListener("blur", () => {
+
+    const newName = input.value.trim();
+
+    task.name = newName || input.dataset.originalValue;
+
+    saveActiveTasks();
+    render();
+
+  });
+
+  // Focus is handled on touchend
+  row._editingInput = input;
+}
+
+
+// DRAG SETUP
 
 function setupDrag() {
 
@@ -2377,56 +2457,101 @@ function setupDrag() {
 
   rows.forEach(row => {
 
-    row.addEventListener("touchstart",e => {
+    row.addEventListener("touchstart", e => {
 
       if (
         e.target.closest(".circle") ||
-        e.target.closest(".remove")
+        e.target.closest(".remove") ||
+        e.target.closest(".editing")
       ) return;
 
       const touch = e.touches[0];
 
       dragIndex = Number(row.dataset.index);
+
       startY = touch.clientY;
+      startX = touch.clientX;
+
       dragStarted = false;
+      dragReady = false;
+      editTriggered = false;
 
       clearTimeout(pressTimer);
+      clearTimeout(editTimer);
 
+      // 300ms: Ready for dragging
       pressTimer = setTimeout(() => {
-        dragStarted = true;
-        row.classList.add("dragging");
-        document.body.classList.add("dragging");
-      },300);
 
-    },{passive:true});
+        dragReady = true;
 
-    row.addEventListener("touchmove",e => {
+      }, 300);
+
+      // 800ms: Start inline editing
+      editTimer = setTimeout(() => {
+
+        if (dragReady && !dragStarted) {
+          startInlineEdit(row);
+        }
+
+      }, 800);
+
+    }, {passive:true});
+
+
+    row.addEventListener("touchmove", e => {
+
+      if (editTriggered) return;
 
       const touch = e.touches[0];
 
-      if (!dragStarted) {
-        if (
-          Math.abs(touch.clientY-startY)>10 ||
-          Math.abs(touch.clientX-swipeStartX)>10
-        ) {
+      const moveY = Math.abs(touch.clientY - startY);
+      const moveX = Math.abs(touch.clientX - startX);
+
+      // Cancel long press if moved before 300ms
+      if (!dragReady) {
+
+        if (moveY > 10 || moveX > 10) {
           clearTimeout(pressTimer);
+          clearTimeout(editTimer);
         }
+
         return;
       }
+
+      // Start dragging after movement
+      if (!dragStarted && (moveY > 10 || moveX > 10)) {
+
+        clearTimeout(editTimer);
+
+        dragStarted = true;
+
+        row.classList.add("dragging");
+        document.body.classList.add("dragging");
+
+      }
+
+      if (!dragStarted) return;
 
       e.preventDefault();
 
       const target = document.elementFromPoint(
-        touch.clientX,touch.clientY
+        touch.clientX,
+        touch.clientY
       );
 
-      const targetRow = target ? target.closest(".task") : null;
+      const targetRow = target
+        ? target.closest(".task")
+        : null;
 
       document.querySelectorAll(".task").forEach(r => {
-        r.classList.remove("drag-target");
+        r.classList.remove(
+          "drag-target",
+          "drag-target-above"
+        );
       });
 
       if (targetRow) {
+
         const targetIndex = Number(targetRow.dataset.index);
 
         if (targetIndex !== dragIndex) {
@@ -2438,26 +2563,60 @@ function setupDrag() {
           }
 
         }
+
       }
 
-    },{passive:false});
+    }, {passive:false});
 
-    row.addEventListener("touchend",e => {
+
+    row.addEventListener("touchend", e => {
 
       clearTimeout(pressTimer);
+      clearTimeout(editTimer);
 
-      if (!dragStarted) {
+      // Inline editing
+      if (editTriggered) {
+
+        const input = row._editingInput;
+
+        if (input) {
+
+          input.focus();
+
+          input.setSelectionRange(
+            input.value.length,
+            input.value.length
+          );
+
+        }
+
         dragIndex = null;
+        dragReady = false;
+        editTriggered = false;
+
         return;
       }
 
+      // No drag
+      if (!dragStarted) {
+
+        dragIndex = null;
+        dragReady = false;
+
+        return;
+      }
+
+      // Complete drag
       const touch = e.changedTouches[0];
 
       const target = document.elementFromPoint(
-        touch.clientX,touch.clientY
+        touch.clientX,
+        touch.clientY
       );
 
-      const targetRow = target ? target.closest(".task") : null;
+      const targetRow = target
+        ? target.closest(".task")
+        : null;
 
       const activeTasks = getActiveTasks();
 
@@ -2466,44 +2625,56 @@ function setupDrag() {
         const targetIndex = Number(targetRow.dataset.index);
 
         if (
-          targetIndex!==dragIndex &&
+          targetIndex !== dragIndex &&
           activeTasks[dragIndex] &&
           activeTasks[targetIndex] &&
-          activeTasks[dragIndex].done===activeTasks[targetIndex].done
+          activeTasks[dragIndex].done ===
+          activeTasks[targetIndex].done
         ) {
 
-          const moved = activeTasks.splice(dragIndex,1)[0];
+          const moved = activeTasks.splice(dragIndex, 1)[0];
 
-          activeTasks.splice(targetIndex,0,moved);
+          activeTasks.splice(targetIndex, 0, moved);
 
           sortActiveTasks();
           saveActiveTasks();
+
         }
+
       }
 
       dragIndex = null;
       dragStarted = false;
+      dragReady = false;
 
       document.body.classList.remove("dragging");
 
       render();
 
-    },{passive:true});
+    }, {passive:true});
 
-    row.addEventListener("touchcancel",() => {
+
+    row.addEventListener("touchcancel", () => {
 
       clearTimeout(pressTimer);
+      clearTimeout(editTimer);
 
       if (dragStarted) {
-        dragIndex = null;
-        dragStarted = false;
+
         document.body.classList.remove("dragging");
         render();
+
       }
+
+      dragIndex = null;
+      dragStarted = false;
+      dragReady = false;
+      editTriggered = false;
 
     });
 
   });
+
 }
 
   
