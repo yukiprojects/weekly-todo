@@ -212,8 +212,11 @@ h1 {
   text-decoration:line-through;
 }
 
-.task-name { flex:1; }
-
+.task-name {
+  flex:1;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
 
 
 /* IMPORTANT TASK MARKER */
@@ -1128,10 +1131,6 @@ html {
   min-width: 0;
 }
 
-.task-name {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
 
 input,
 textarea,
