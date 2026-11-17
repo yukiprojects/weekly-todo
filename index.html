@@ -2363,6 +2363,7 @@ function removeTask(i) {
 
 
 
+
 // =====================================
 // DRAG AND DROP
 // =====================================
@@ -2370,6 +2371,7 @@ function removeTask(i) {
 let dragIndex = null;
 let dragStarted = false;
 let pressTimer = null;
+let dragTargetIndex = null;
 
 let startY = 0;
 let startX = 0;
@@ -2393,6 +2395,7 @@ function setupDrag() {
       const touch = e.touches[0];
 
       dragIndex = Number(row.dataset.index);
+      dragTargetIndex = null;
 
       startY = touch.clientY;
       startX = touch.clientX;
@@ -2441,19 +2444,29 @@ function setupDrag() {
         : null;
 
       document.querySelectorAll(".task").forEach(r => {
-
         r.classList.remove(
           "drag-target",
           "drag-target-above"
         );
-
       });
+
+      dragTargetIndex = null;
 
       if (targetRow) {
 
         const targetIndex = Number(targetRow.dataset.index);
 
-        if (targetIndex !== dragIndex) {
+        const activeTasks = getActiveTasks();
+
+        if (
+          targetIndex !== dragIndex &&
+          activeTasks[dragIndex] &&
+          activeTasks[targetIndex] &&
+          activeTasks[dragIndex].done ===
+          activeTasks[targetIndex].done
+        ) {
+
+          dragTargetIndex = targetIndex;
 
           targetRow.classList.add("drag-target");
 
@@ -2468,54 +2481,37 @@ function setupDrag() {
     }, { passive: false });
 
 
-    row.addEventListener("touchend", e => {
+    row.addEventListener("touchend", () => {
 
       clearTimeout(pressTimer);
 
       if (!dragStarted) {
 
         dragIndex = null;
+        dragTargetIndex = null;
 
         return;
       }
 
-      const touch = e.changedTouches[0];
-
-      const target = document.elementFromPoint(
-        touch.clientX,
-        touch.clientY
-      );
-
-      const targetRow = target
-        ? target.closest(".task")
-        : null;
-
       const activeTasks = getActiveTasks();
 
-      if (targetRow) {
+      if (
+        dragTargetIndex !== null &&
+        dragTargetIndex !== dragIndex &&
+        activeTasks[dragIndex] &&
+        activeTasks[dragTargetIndex]
+      ) {
 
-        const targetIndex = Number(targetRow.dataset.index);
+        const moved = activeTasks.splice(dragIndex, 1)[0];
 
-        if (
-          targetIndex !== dragIndex &&
-          activeTasks[dragIndex] &&
-          activeTasks[targetIndex] &&
-          activeTasks[dragIndex].done ===
-          activeTasks[targetIndex].done
-        ) {
+        activeTasks.splice(dragTargetIndex, 0, moved);
 
-          const moved = activeTasks.splice(dragIndex, 1)[0];
-
-          activeTasks.splice(targetIndex, 0, moved);
-
-          sortActiveTasks();
-          saveActiveTasks();
-
-        }
+        saveActiveTasks();
 
       }
 
       dragIndex = null;
+      dragTargetIndex = null;
       dragStarted = false;
 
       document.body.classList.remove("dragging");
@@ -2532,6 +2528,7 @@ function setupDrag() {
       document.body.classList.remove("dragging");
 
       dragIndex = null;
+      dragTargetIndex = null;
       dragStarted = false;
 
       render();
@@ -2541,6 +2538,7 @@ function setupDrag() {
   });
 
 }
+
   
 // =====================================
 // DAILY DATA
