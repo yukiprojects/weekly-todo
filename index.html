@@ -2471,75 +2471,51 @@ function setupDrag() {
 
     row.addEventListener("touchend", e => {
 
-      clearTimeout(pressTimer);
+  clearTimeout(pressTimer);
 
-      if (!dragStarted) {
-        dragIndex = null;
-        return;
-      }
+  if (!dragStarted) {
+    dragIndex = null;
+    return;
+  }
 
-      const touch = e.changedTouches[0];
+  // Get the row currently showing the green line
+  const targetRow = document.querySelector(
+    ".task.drag-target"
+  );
 
-      const target = document.elementFromPoint(
-        touch.clientX,
-        touch.clientY
-      );
+  const activeTasks = getActiveTasks();
 
-      const targetRow = target
-        ? target.closest(".task")
-        : null;
+  if (targetRow) {
 
-      const activeTasks = getActiveTasks();
+    const targetIndex = Number(targetRow.dataset.index);
 
-      if (targetRow) {
+    if (
+      targetIndex !== dragIndex &&
+      activeTasks[dragIndex] &&
+      activeTasks[targetIndex] &&
+      activeTasks[dragIndex].done ===
+      activeTasks[targetIndex].done
+    ) {
 
-        const targetIndex = Number(targetRow.dataset.index);
+      const moved = activeTasks.splice(dragIndex, 1)[0];
 
-        if (
-          targetIndex !== dragIndex &&
-          activeTasks[dragIndex] &&
-          activeTasks[targetIndex] &&
-          activeTasks[dragIndex].done ===
-          activeTasks[targetIndex].done
-        ) {
+      activeTasks.splice(targetIndex, 0, moved);
 
-          const moved = activeTasks.splice(dragIndex, 1)[0];
+      sortActiveTasks();
+      saveActiveTasks();
 
-          activeTasks.splice(targetIndex, 0, moved);
+    }
 
-          sortActiveTasks();
-          saveActiveTasks();
+  }
 
-        }
+  dragIndex = null;
+  dragStarted = false;
 
-      }
+  document.body.classList.remove("dragging");
 
-      dragIndex = null;
-      dragStarted = false;
+  render();
 
-      document.body.classList.remove("dragging");
-
-      render();
-
-    }, { passive: true });
-
-
-    row.addEventListener("touchcancel", () => {
-
-      clearTimeout(pressTimer);
-
-      document.body.classList.remove("dragging");
-
-      dragIndex = null;
-      dragStarted = false;
-
-      render();
-
-    });
-
-  });
-
-}
+}, { passive: true });
   
 // =====================================
 // DAILY DATA
