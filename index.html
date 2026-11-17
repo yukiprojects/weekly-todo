@@ -2089,9 +2089,10 @@ function updateWeekDisplay() {
   weekDates = getWeekDates();
 
   document.getElementById("period").textContent =
-    formatDate(weekDates[0])+" — "+
-    formatDate(weekDates[6])+", "+
-    weekDates[6].getFullYear();
+    weekDates[0].toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric"
+    });
 }
 
 
