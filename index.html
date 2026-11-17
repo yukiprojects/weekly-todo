@@ -3184,11 +3184,24 @@ function loadMonthly() {
   document.getElementById("oneThing").value = data.oneThing || "";
 }
 
+function updateMonthlyFields() {
+  document.querySelectorAll(".month-textarea").forEach(textarea => {
+    textarea.classList.toggle(
+      "filled",
+      textarea.value.trim().length > 0
+    );
+  });
+}
+
 document.querySelectorAll(".month-textarea").forEach(textarea => {
-  textarea.addEventListener("input",saveMonthly);
+  textarea.addEventListener("input", () => {
+    updateMonthlyFields();
+    saveMonthly();
+  });
 });
 
 loadMonthly();
+updateMonthlyFields();
 
 
 // =====================================
