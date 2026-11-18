@@ -1,15 +1,23 @@
 
-const CACHE_NAME = "plan-cache-v1";
+const CACHE_NAME = "plan-cache-v2";
 
 const APP_FILES = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./icon.PNG"
+  "./icon.PNG",
+  "./common.css",
+  "./todo.css",
+  "./calendar.css",
+  "./goals.css",
+  "./script.js"
 ];
 
-// インストール時
+
+// INSTALL
+
 self.addEventListener("install", event => {
+
   self.skipWaiting();
 
   event.waitUntil(
@@ -18,12 +26,17 @@ self.addEventListener("install", event => {
       await cache.addAll(APP_FILES);
     })()
   );
+
 });
 
-// 有効化時
+
+// ACTIVATE
+
 self.addEventListener("activate", event => {
+
   event.waitUntil(
     (async () => {
+
       const keys = await caches.keys();
 
       await Promise.all(
@@ -34,40 +47,70 @@ self.addEventListener("activate", event => {
       );
 
       await self.clients.claim();
+
     })()
   );
+
 });
 
-// ページ読み込み時
-self.addEventListener("fetch", event => {
-  if (event.request.method !== "GET") return;
 
-  if (event.request.mode !== "navigate") return;
+// FETCH
+
+self.addEventListener("fetch", event => {
+
+  const request = event.request;
+
+  if (request.method !== "GET") return;
+
+  // 外部サイトは対象外
+  if (new URL(request.url).origin !== self.location.origin) return;
 
   event.respondWith(
-    fetch(event.request, { cache: "no-store" })
-      .then(async response => {
+    (async () => {
+
+      try {
+
+        // まずネットから最新版を取得
+        const response = await fetch(request, {
+          cache: "no-store"
+        });
+
         if (response.ok) {
           const cache = await caches.open(CACHE_NAME);
-          await cache.put("./", response.clone());
+          await cache.put(request, response.clone());
         }
 
         return response;
-      })
-      .catch(async () => {
-        const cached = await caches.match("./");
+
+      } catch(error) {
+
+        // オフラインならキャッシュを使用
+        const cached = await caches.match(request);
 
         if (cached) return cached;
+
+        // ページの場合はトップページを返す
+        if (request.mode === "navigate") {
+
+          const fallback = await caches.match("./");
+
+          if (fallback) return fallback;
+
+        }
 
         return new Response(
           "Offline. Please connect to the internet.",
           {
-            status: 503,
-            headers: {
-              "Content-Type": "text/plain; charset=utf-8"
+            status:503,
+            headers:{
+              "Content-Type":"text/plain; charset=utf-8"
             }
           }
         );
-      })
+
+      }
+
+    })()
   );
+
 });
