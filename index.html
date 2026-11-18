@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<meta name="description" content="PLAN. — Keep your plans on track.">
+<meta name="application-name" content="PLAN.">
+
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" href="./icon.PNG">
+<link rel="apple-touch-icon" href="./icon.PNG">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PLAN.">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
+<link rel="stylesheet" href="./common.css">
+<link rel="stylesheet" href="./todo.css">
+<link rel="stylesheet" href="./calendar.css">
+<link rel="stylesheet" href="./goals.css">
+
+
+<title>PLAN.</title>
+</head>
+
+<body>
+
+<div id="app">
+
+<!-- =====================================
+     PAGE : TODO (MAIN) used to be WEEKLY
+===================================== -->
+
+<div class="page" id="weekly">
+
+<header>
+  <div class="brand">
+    <svg class="calendar-icon" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.7"
+         stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="5" width="18" height="16" rx="2"/>
+      <path d="M16 3v4M8 3v4M3 10h18"/>
+      <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/>
+    </svg>
+    <div>
+      <h1>TODO.</h1>
+      <div class="sub" id="period"></div>
+    </div>
+  </div>
+
+  <button
+    class="weekly-add-button"
+    onclick="openTodoEditor()"
+    aria-label="Add new todo"
+  >+</button>
+</header>
+
+<div class="weekdays" id="weekdays"></div>
+
+<!-- TODO TABS -->
+<div class="todo-tabs">
+  <button
+    class="todo-tab active"
+    id="todayTab"
+    type="button"
+    onclick="switchTodoTab('today')"
+  >TODAY</button>
+
+  <button
+    class="todo-tab"
+    id="weekTab"
+    type="button"
+    onclick="switchTodoTab('week')"
+  >WEEK</button>
+</div>
+
+<div id="list"></div>
+
+<div class="section finished-header">
+  <div class="finished-count" id="finishedCount">0/0 DONE!</div>
+</div>
+
+<div id="finishedList"></div>
+
+<!-- WEEKLY TODO EDITOR MODAL -->
+<div
+  class="todo-modal"
+  id="todoModal"
+  onclick="closeTodoEditor()"
+>
+  <div
+    class="todo-editor"
+    onclick="event.stopPropagation()"
+  >
+
+    <div class="todo-editor-header">
+      <div class="todo-editor-title">NEW TODO</div>
+      <button
+        class="todo-close-button"
+        onclick="closeTodoEditor()"
+        aria-label="Close"
+      >×</button>
+    </div>
+
+    <div class="editor-label">TASK TITLE</div>
+
+    <input
+      id="todoName"
+      class="todo-input"
+      placeholder="What do you need to do?"
+      maxlength="100"
+    />
+
+    <div class="todo-important-row">
+  
+  <div class="todo-important-label">
+    <div class="todo-important-title">IMPORTANT</div>
+    <div class="todo-important-description" id="todoImportantDescription">
+      Highlight this task in Weekly Todo
+    </div>
+  </div>
+  
+  <label class="todo-switch">
+    <input type="checkbox" id="todoImportant">
+    <span class="todo-switch-slider"></span>
+  </label>
+  
+</div>
+
+
+<div class="todo-important-row">
+  
+  <div class="todo-important-label">
+    <div class="todo-important-title">REPEAT</div>
+    <div class="todo-important-description" id="todoRepeatDescription">
+      Repeat this task every day
+    </div>
+  </div>
+  
+  <label class="todo-switch">
+    <input type="checkbox" id="todoRepeat">
+    <span class="todo-switch-slider"></span>
+  </label>
+  
+</div>
+
+    <button
+      class="todo-save-button"
+      onclick="saveTodo()"
+    >SAVE</button>
+
+  </div>
+</div>
+
+</div>
+
+
+<!-- =====================================
+     PAGE : CALENDAR (used to be DAILY)
+===================================== -->
+
+<div class="page" id="daily">
+
+  <div class="daily-header">
+
+    <div class="brand">
+      <svg class="calendar-icon" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.7"
+           stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="16" rx="2"/>
+        <path d="M16 3v4M8 3v4M3 10h18"/>
+        <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/>
+      </svg>
+      <h1 class="daily-title">CALENDAR.</h1>
+    </div>
+
+    <div class="daily-date-row">
+
+      <div class="date-nav">
+        <button onclick="changeDailyDate(-1)">‹</button>
+        <input
+          type="date"
+          id="dailyDate"
+          class="daily-date"
+          onchange="selectDailyDate()"
+        />
+        <button onclick="changeDailyDate(1)">›</button>
+      </div>
+
+      <div class="daily-actions">
+        <button
+          class="daily-settings-button"
+          onclick="openDailySettings()"
+          aria-label="Daily settings"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 2.8v2"/>
+            <path d="M12 19.2v2"/>
+            <path d="M21.2 12h-2"/>
+            <path d="M4.8 12h-2"/>
+            <path d="m18.5 5.5-1.4 1.4"/>
+            <path d="m6.9 17.1-1.4 1.4"/>
+            <path d="m18.5 18.5-1.4-1.4"/>
+            <path d="M6.9 6.9 5.5 5.5"/>
+            <circle cx="12" cy="12" r="7"/>
+            <circle cx="12" cy="12" r="2.5"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="dailySettingsPanel" class="daily-settings-panel" style="display:none;">
+        <h3>DAILY SETTINGS</h3>
+
+        <label for="dailyStartTime">Start time</label>
+        <select id="dailyStartTime"></select>
+
+        <label for="dailyEndTime">End time</label>
+        <select id="dailyEndTime"></select>
+
+        <button onclick="saveDailySettings()">SAVE</button>
+        <button onclick="closeDailySettings()">CANCEL</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- DAILY TIMELINE -->
+  <div class="daily-scroll-area" id="dailyScrollArea">
+
+    <div class="timeline" id="timeline">
+      <div class="timeline-track" id="timelineTrack"></div>
+      <div class="timeline-events" id="timelineEvents"></div>
+    </div>
+
+    <div class="daily-bottom">
+      <p>Plan your day, one block at a time.</p>
+    </div>
+
+  </div>
+
+
+  <!-- DAILY EVENT MODAL -->
+  <div
+    class="event-modal"
+    id="eventModal"
+    onclick="closeEventEditor()"
+  >
+
+    <div
+      class="event-editor"
+      id="eventEditor"
+      onclick="event.stopPropagation()"
+    >
+
+      <div class="editor-title" id="editorTitle">NEW EVENT</div>
+
+      <div class="editor-label">EVENT TITLE</div>
+
+      <input
+        id="eventName"
+        class="event-input"
+        placeholder="What are you doing?"
+        maxlength="100"
+      />
+
+      <div class="time-fields">
+
+        <div>
+          <div class="editor-label">START</div>
+          <select id="eventStart" class="event-select"></select>
+        </div>
+
+        <div>
+          <div class="editor-label">END</div>
+          <select id="eventEnd" class="event-select"></select>
+        </div>
+
+      </div>
+
+      <div class="event-editor-hint">
+        Schedule range: 05:00 – 02:00 next day.
+      </div>
+
+      <div class="editor-actions">
+
+        <button onclick="saveDailyEvent()">SAVE</button>
+
+        <button
+          class="cancel-button"
+          onclick="closeEventEditor()"
+        >CANCEL</button>
+
+  <button
+    class="delete-button"
+    id="deleteEventButton"
+    onclick="deleteDailyEvent()"
+    style="display:none;"
+  >DELETE</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================
+     PAGE : GOALS (used to be MONTHLY)
+===================================== -->
+
+<div class="page" id="monthly">
+
+  <div id="monthlyMain">
+
+    <div class="month-header">
+
+      <div class="month-topbar">
+
+        <div class="brand">
+          <svg class="calendar-icon" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="5" width="18" height="16" rx="2"/>
+            <path d="M16 3v4M8 3v4M3 10h18"/>
+            <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/>
+          </svg>
+
+          <div>
+            <h1 class="month-title">GOALS.</h1>
+            <div class="month-period" id="monthPeriod"></div>
+          </div>
+        </div>
+
+        <button class="past-button" onclick="showArchive()">
+          PAST MONTHS
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="month-section">
+      <div class="month-label">MY FUTURE SELF</div>
+      <div class="month-question">
+        1ヶ月後、どんな自分になっていたい？
+      </div>
+      <textarea class="month-textarea" id="futureSelf"
+        placeholder="I want to become someone who..."></textarea>
+    </div>
+
+    <div class="month-section">
+      <div class="month-label">NEW SKILLS</div>
+      <div class="month-question">
+        1ヶ月後、何ができるようになっていたい？
+      </div>
+      <textarea class="month-textarea" id="newSkills"
+        placeholder="I want to be able to..."></textarea>
+    </div>
+
+    <div class="month-section">
+      <div class="month-label">MY GOALS</div>
+      <div class="month-question">
+        今月、達成したいことは？
+      </div>
+      <textarea class="month-textarea" id="monthlyGoals"
+        placeholder="My goals this month..."></textarea>
+    </div>
+
+    <div class="month-section">
+      <div class="month-label">ONE THING TO CHANGE</div>
+      <div class="month-question">
+        今の自分から変えたいことは？
+      </div>
+      <textarea class="month-textarea" id="oneThing"
+        placeholder="One thing I want to change..."></textarea>
+    </div>
+
+    <div class="month-footer">
+      <h3>One month. One step.</h3>
+      <p>
+        Small actions today create a different tomorrow.
+      </p>
+      <div class="save-status" id="saveStatus">SAVED</div>
+    </div>
+
+  </div>
+
+  <div id="archive">
+
+    <div class="archive-header">
+      <h2 class="archive-title">PAST MONTHS</h2>
+      <button class="archive-close" onclick="closeArchive()">
+        CLOSE ×
+      </button>
+    </div>
+
+    <p class="archive-description">
+      Look back at your previous reflections.
+    </p>
+
+    <div id="historyList"></div>
+
+  </div>
+
+</div>
+
+
+<div class="page-indicator">
+  <span id="dotDaily"></span>
+  <span id="dotWeekly" class="active"></span>
+  <span id="dotMonthly"></span>
+</div>
+
+</div>
+
+<script src="./script.js"></script>
+</body>
+</html>
