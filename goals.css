@@ -1,0 +1,232 @@
+
+/* =====================================
+   GOALS PAGE
+===================================== */
+
+#monthly {
+  display:none;
+}
+
+.month-header {
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+
+.month-topbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.month-title {
+  font-size:32px;
+  letter-spacing:2px;
+  margin:0;
+}
+
+.month-period {
+  color:#75d69b;
+  font-size:14px;
+  letter-spacing:1px;
+}
+
+.past-button {
+  background:#222;
+  color:#aaa;
+  border:1px solid #444;
+  border-radius:8px;
+  padding:10px 14px;
+}
+
+.month-section {
+  margin-top:28px;
+}
+
+.month-label {
+  color:#75d69b;
+  font-size:13px;
+  letter-spacing:1px;
+  margin-bottom:10px;
+}
+
+.month-question {
+  font-size:16px;
+  margin-bottom:12px;
+}
+
+.month-textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 100px;
+  box-sizing: border-box;
+  
+  font-size: 16px;
+  line-height: 1.5;
+  
+  background: #1b1b1b;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 14px;
+  
+  resize: none;
+}
+
+.month-textarea:focus {
+  outline:none;
+  border-color:#75d69b;
+}
+
+.month-textarea.filled {
+  border-color:#75d69b;
+}
+
+.month-textarea::placeholder {
+  color:#666;
+}
+
+.month-footer {
+  margin-top:30px;
+}
+
+.month-footer h3 {
+  margin:0 0 8px;
+}
+
+.month-footer p {
+  color:#999;
+}
+
+.save-status {
+  color:#75d69b;
+  font-size:13px;
+}
+
+#archive {
+  display:none;
+}
+
+.archive-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.archive-title {
+  font-size:26px;
+  margin:0;
+}
+
+.archive-close {
+  background:none;
+  border:none;
+  color:white;
+  font-size:24px;
+}
+
+.archive-description {
+  color:#999;
+  margin-bottom:24px;
+}
+
+.history-month {
+  margin-bottom:24px;
+}
+
+.history-month-title {
+  color:#75d69b;
+  font-size:15px;
+  margin-bottom:12px;
+}
+
+.history-item {
+  background:#1b1b1b;
+  border-radius:8px;
+  padding:14px;
+  margin-bottom:10px;
+}
+
+.history-label {
+  color:#75d69b;
+  font-size:12px;
+  margin-bottom:6px;
+}
+
+.history-value {
+  white-space:pre-wrap;
+}
+
+.history-value.empty {
+  color:#666;
+}
+
+.archive-empty {
+  text-align:center;
+  padding:40px 20px;
+}
+
+.archive-empty-title {
+  font-size:18px;
+  margin-bottom:8px;
+}
+
+.archive-empty-description {
+  color:#888;
+}
+
+
+/* =====================================
+   GOALS RESPONSIVE
+===================================== */
+
+@media screen and (max-width: 768px) {
+
+  .month-topbar {
+    flex-wrap:wrap;
+  }
+
+  .month-topbar .brand {
+    flex:1 1 220px;
+    min-width:0;
+  }
+
+  .past-button {
+    flex-shrink:0;
+    margin-left:auto;
+  }
+
+}
+
+@media screen and (max-width: 420px) {
+
+  .month-topbar {
+    align-items:flex-start;
+    row-gap:12px;
+  }
+
+  .month-topbar .brand {
+    flex:1 1 220px;
+  }
+
+  .month-title {
+    font-size:clamp(27px, 8vw, 32px);
+  }
+
+  .past-button {
+    margin-left:auto;
+  }
+
+  .archive-header {
+    flex-wrap:wrap;
+    gap:12px;
+  }
+
+  .archive-title {
+    font-size:clamp(21px, 6vw, 25px);
+  }
+
+}
