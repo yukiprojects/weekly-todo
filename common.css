@@ -1,0 +1,126 @@
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  padding:38px clamp(12px, 5vw, 24px);
+  padding-top:calc(38px + env(safe-area-inset-top));
+  padding-bottom:calc(38px + env(safe-area-inset-bottom));
+  background:#111;
+  color:white;
+  font-family:-apple-system,sans-serif;
+  overflow-x:hidden;
+  width:100%;
+  max-width:100%;
+}
+
+button,input,textarea,select {
+  font-family:inherit;
+}
+
+#app {
+  position:relative;
+  width:100%;
+  overflow:hidden;
+}
+
+.page {
+  width:100%;
+  min-height:70vh;
+}
+
+.brand {
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  min-width:0;
+}
+
+.calendar-icon {
+  width:34px;
+  height:34px;
+  color:#75d69b;
+  flex-shrink:0;
+  margin-top:0;
+}
+
+h1 {
+  font-size:32px;
+  letter-spacing:3px;
+  margin:0;
+}
+
+
+/* =====================================
+   RESPONSIVE LAYOUT
+===================================== */
+
+html {
+  width:100%;
+  max-width:100%;
+}
+
+#app,
+.page {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+
+input,
+textarea,
+select {
+  max-width:100%;
+  min-width:0;
+}
+
+
+/* Extra narrow smartphones */
+@media screen and (max-width: 350px) {
+
+  .calendar-icon {
+    width:30px;
+    height:30px;
+  }
+
+  .brand {
+    gap:8px;
+  }
+
+}
+
+
+input {
+  width: 100%;
+  flex: 1;
+  min-width: 0;
+  padding: 14px;
+  background: #1b1b1b;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: white;
+  font-size: 15px;
+  outline: none;
+}
+
+input:focus {
+  border-color:#75d69b;
+}
+
+
+button {
+  background: #75d69b;
+  color: #111;
+  border: 0;
+  border-radius: 9px;
+  padding: 0 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.editor-label {
+  color: #aaa;
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin: 15px 0 8px;
+}
