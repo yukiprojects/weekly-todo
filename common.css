@@ -124,3 +124,35 @@ button {
   letter-spacing: 1px;
   margin: 15px 0 8px;
 }
+
+/* =====================================
+   PAGE INDICATOR
+===================================== */
+
+.page-indicator {
+  position: fixed;
+  left: 50%;
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  z-index: 1000;
+}
+
+.page-dot {
+  width: 5px;
+  height: 5px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #555;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.page-dot.active {
+  background: #75d69b;
+  transform: scale(1.25);
+}
