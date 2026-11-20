@@ -1890,12 +1890,30 @@ function showPage(page, force = false) {
 renderPageIndicator();
 
 // =====================================
-// PREVENT PAGE PINCH ZOOM
+// PREVENT PAGE PINCH OUT
 // =====================================
+
+let pinchStartDistance = 0;
+
+function getPinchDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+document.addEventListener("touchstart", e => {
+  if (e.touches.length === 2) {
+    pinchStartDistance = getPinchDistance(e.touches);
+  }
+}, {
+  passive: true,
+  capture: true
+});
 
 document.addEventListener("touchmove", e => {
   
-  if (e.touches.length < 2) return;
+  if (e.touches.length !== 2) return;
   
   const target = e.target;
   
@@ -1903,16 +1921,28 @@ document.addEventListener("touchmove", e => {
     target.closest &&
     target.closest(".ideas-workspace");
   
-  // Allow pinch zoom only on Ideas canvas in Edit mode.
+  // Allow both pinch directions on Ideas canvas in Edit mode.
   if (isIdeasCanvas && ideasEditMode) return;
   
-  // Prevent page zoom everywhere else.
-  e.preventDefault();
+  const currentDistance = getPinchDistance(e.touches);
+  
+  // Block only Pinch Out.
+  if (currentDistance > pinchStartDistance + 3) {
+    e.preventDefault();
+  }
   
 }, {
   passive: false,
   capture: true
 });
+
+document.addEventListener("touchend", () => {
+  pinchStartDistance = 0;
+}, { capture: true });
+
+document.addEventListener("touchcancel", () => {
+  pinchStartDistance = 0;
+}, { capture: true });
 
 
 // =====================================
