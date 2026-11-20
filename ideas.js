@@ -22,8 +22,6 @@ let ideasPanY = 0;
 
 let ideasEditMode = false;
 
-
-
 /* =====================================
    INITIALIZE
 ===================================== */
@@ -38,13 +36,52 @@ function initIdeas() {
 
     <div class="ideas-workspace" id="ideasWorkspace">
 
-      <div class="ideas-link-message" id="ideasLinkMessage" hidden>
-        Select a node to connect
-      </div>
+  <div class="ideas-guide" id="ideasGuide">
+    <div class="ideas-guide-icon">
+  <svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="38"
+  height="38"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- Bulb -->
+  <path d="M9 18h6"/>
+  <path d="M10 22h4"/>
+  <path d="M15.1 14a6 6 0 1 0-6.2 0c.6.5 1 1.2 1.1 2h4c.1-.8.5-1.5 1.1-2z"/>
 
-      <div class="ideas-world" id="ideasWorld"></div>
+  <!-- Five evenly spread light rays -->
+  <path d="M12 -3.8V-1.4"/>
+  <path d="M2.5 -0.8L4.2 0.9"/>
+  <path d="M21.5 -0.8L19.8 0.9"/>
+  <path d="M-0.8 7H1.6"/>
+  <path d="M24.8 7H22.4"/>
+</svg>
+</div>
 
+    <div class="ideas-guide-title">GET STARTED</div>
+
+    <div class="ideas-guide-main">
+      Tap Edit to start creating your ideas.
     </div>
+
+    <div class="ideas-guide-description">
+      Add elements, connect your thoughts,
+      and build your own mind map.
+    </div>
+  </div>
+
+  <div class="ideas-link-message" id="ideasLinkMessage" hidden>
+    Select a node to connect
+  </div>
+
+  <div class="ideas-world" id="ideasWorld"></div>
+
+</div>
 
     <div class="ideas-modal" id="ideasModal">
       <div class="ideas-modal-content">
@@ -146,6 +183,8 @@ if (editButton) {
     if (editingLabel) {
       editingLabel.style.display = ideasEditMode ? "block" : "none";
     }
+    
+    updateIdeasGuide();
     
   });
 }
@@ -250,7 +289,6 @@ function loadIdeas() {
 
 }
 
-
 function saveIdeas() {
 
   localStorage.setItem(
@@ -259,7 +297,6 @@ function saveIdeas() {
   );
 
 }
-
 
 /* =====================================
    LOAD / SAVE CONNECTIONS
@@ -277,7 +314,6 @@ function loadIdeasConnections() {
 
 }
 
-
 function saveIdeasConnections() {
 
   localStorage.setItem(
@@ -286,7 +322,6 @@ function saveIdeasConnections() {
   );
 
 }
-
 
 /* =====================================
    CANVAS VIEW LOAD / SAVE
@@ -316,7 +351,6 @@ function loadIdeasView() {
 
 }
 
-
 function saveIdeasView() {
 
   localStorage.setItem(
@@ -330,7 +364,6 @@ function saveIdeasView() {
 
 }
 
-
 function updateIdeasView() {
 
   const world = document.getElementById("ideasWorld");
@@ -341,7 +374,6 @@ function updateIdeasView() {
     `translate(${ideasPanX}px, ${ideasPanY}px) scale(${ideasScale})`;
 
 }
-
 
 /* =====================================
    CANVAS GESTURES
@@ -585,6 +617,22 @@ function initIdeasCanvasGestures() {
   
 }
 
+/* =====================================
+   EMPTY CANVAS GUIDE
+===================================== */
+
+function updateIdeasGuide() {
+  
+  const guide = document.getElementById("ideasGuide");
+  
+  if (!guide) return;
+  
+  guide.style.display =
+    ideasNodes.length === 0 && !ideasEditMode ?
+    "flex" :
+    "none";
+  
+}
 
 /* =====================================
    RENDER
@@ -624,7 +672,6 @@ function renderIdeas() {
     let suppressNextClick = false;
     let pressTimer = null;
 
-
     // NODE PRESS START
 
     element.addEventListener("pointerdown", e => {
@@ -653,7 +700,6 @@ function renderIdeas() {
 
     });
 
-
     // NODE MOVE
 
     element.addEventListener("pointermove", e => {
@@ -662,7 +708,6 @@ function renderIdeas() {
 
       const diffX = e.clientX - startX;
       const diffY = e.clientY - startY;
-
 
       // BEFORE LONG PRESS
 
@@ -680,7 +725,6 @@ function renderIdeas() {
 
       }
 
-
       // AFTER LONG PRESS
 
       e.stopPropagation();
@@ -695,7 +739,6 @@ function renderIdeas() {
 
       if (!moved) return;
 
-
       // WORLD COORDINATES
 
       node.x = startLeft + diffX / ideasScale;
@@ -707,7 +750,6 @@ function renderIdeas() {
       renderIdeaConnections(world);
 
     });
-
 
     // NODE PRESS END
 
@@ -746,7 +788,6 @@ function renderIdeas() {
     element.addEventListener("pointerup", endNodePress);
     element.addEventListener("pointercancel", endNodePress);
 
-
     // NODE TAP
 
     element.addEventListener("click", () => {
@@ -772,13 +813,13 @@ function renderIdeas() {
 
     });
 
-
     world.appendChild(element);
 
   });
 
-}
+updateIdeasGuide();
 
+}
 
 /* =====================================
    RENDER CONNECTIONS
@@ -833,7 +874,6 @@ function renderIdeaConnections(world) {
   defs.appendChild(marker);
   svg.appendChild(defs);
 
-
   ideasConnections.forEach(connection => {
 
     const from = ideasNodes.find(node => node.id === connection.from);
@@ -846,7 +886,6 @@ function renderIdeaConnections(world) {
 
     const x2 = to.x;
     const y2 = to.y;
-
 
     // INVISIBLE HIT AREA
 
@@ -868,7 +907,6 @@ function renderIdeaConnections(world) {
     });
 
     svg.appendChild(hitbox);
-
 
     // VISIBLE LINE
 
@@ -897,13 +935,11 @@ function renderIdeaConnections(world) {
 
   });
 
-
   // Keep connections behind nodes.
 
   world.prepend(svg);
 
 }
-
 
 /* =====================================
    LINK MODE
@@ -923,7 +959,6 @@ function activateLinkMode(id) {
 
 }
 
-
 function cancelLinkMode() {
 
   linkSourceId = null;
@@ -937,7 +972,6 @@ function cancelLinkMode() {
   renderIdeas();
 
 }
-
 
 /* =====================================
    COMPLETE LINK SELECTION
@@ -994,12 +1028,13 @@ function completeLinkSelection(targetId) {
   
 }
 
-
 /* =====================================
    CONNECTION MODAL
 ===================================== */
 
 function openConnectionModal(id = null) {
+  
+  if (!ideasEditMode) return;
 
   selectedConnectionId = id;
 
@@ -1023,7 +1058,6 @@ function openConnectionModal(id = null) {
 
 }
 
-
 function closeConnectionModal() {
 
   document.getElementById("ideasConnectionModal").classList.remove("active");
@@ -1032,7 +1066,6 @@ function closeConnectionModal() {
   pendingConnection = null;
 
 }
-
 
 function saveConnection(type) {
 
@@ -1085,7 +1118,6 @@ function saveConnection(type) {
 
 }
 
-
 function deleteConnection() {
 
   if (!selectedConnectionId) return;
@@ -1101,13 +1133,13 @@ function deleteConnection() {
 
 }
 
-
-
 /* =====================================
    OPEN IDEA MODAL
 ===================================== */
 
 function openIdeaModal(id = null) {
+  
+  if (!ideasEditMode) return;
 
   editingIdeaId = id;
 
@@ -1156,7 +1188,6 @@ function openIdeaModal(id = null) {
 
 }
 
-
 /* =====================================
    CLOSE IDEA MODAL
 ===================================== */
@@ -1168,7 +1199,6 @@ function closeIdeaModal() {
   editingIdeaId = null;
 
 }
-
 
 /* =====================================
    SAVE IDEA
