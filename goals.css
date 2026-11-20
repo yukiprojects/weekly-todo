@@ -99,7 +99,9 @@
 }
 
 .month-footer p {
-  color:#999;
+  color:#777;
+font-size:12px;
+line-height:1.6;
 }
 
 .save-status {
@@ -107,77 +109,115 @@
   font-size:13px;
 }
 
+
 #archive {
-  display:none;
+  display: none;
+  padding-bottom: 30px;
 }
 
 .archive-header {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #292929;
 }
 
 .archive-title {
-  font-size:26px;
-  margin:0;
+  font-size: 26px;
+  letter-spacing: 1.5px;
+  margin: 0;
 }
 
 .archive-close {
-  background:none;
-  border:none;
-  color:white;
-  font-size:24px;
+  background: #1b1b1b;
+  border: 1px solid #383838;
+  border-radius: 8px;
+  color: #aaa;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.archive-close:active {
+  background: #292929;
+  color: white;
+  transform: scale(0.97);
 }
 
 .archive-description {
-  color:#999;
-  margin-bottom:24px;
+  color: #777;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 18px 0 30px;
 }
 
 .history-month {
-  margin-bottom:24px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #292929;
+}
+
+.history-month:last-child {
+  border-bottom: none;
 }
 
 .history-month-title {
-  color:#75d69b;
-  font-size:15px;
-  margin-bottom:12px;
+  color: #75d69b;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin: 0 0 16px;
 }
 
 .history-item {
-  background:#1b1b1b;
-  border-radius:8px;
-  padding:14px;
-  margin-bottom:10px;
+  background: #1b1b1b;
+  border: 1px solid #292929;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
 }
 
 .history-label {
-  color:#75d69b;
-  font-size:12px;
-  margin-bottom:6px;
+  color: #75d69b;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
 }
 
 .history-value {
-  white-space:pre-wrap;
+  color: #e5e5e5;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .history-value.empty {
-  color:#666;
+  color: #555;
+  font-style: italic;
 }
 
 .archive-empty {
-  text-align:center;
-  padding:40px 20px;
+  text-align: center;
+  padding: 70px 20px;
 }
 
 .archive-empty-title {
-  font-size:18px;
-  margin-bottom:8px;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 .archive-empty-description {
-  color:#888;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.7;
 }
+
 
 
 /* =====================================
@@ -230,4 +270,8 @@
     font-size:clamp(21px, 6vw, 25px);
   }
 
+}
+
+#saveStatus {
+  display: none;
 }
