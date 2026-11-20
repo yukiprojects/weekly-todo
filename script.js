@@ -407,7 +407,7 @@ function render() {
           return `
             <div class="task ${t.important ? "important" : ""} ${t.repeat ? "repeat" : ""}" data-index="${i}">
               <div class="circle" onclick="toggle(${i})"></div>
-              <span class="task-name">${escapeHTML(t.name)}</span>
+              <span class="task-name" onclick="editTask(${i})">${escapeHTML(t.name)}</span>
               <span class="remove" onclick="removeTask(${i})">×</span>
             </div>
           `;
@@ -532,60 +532,156 @@ taskInput.addEventListener("keydown", event => {
   saveTodo();
 });
 
+let editingTaskIndex = null;
+
 
 // =====================================
 // TODO EDITOR
 // =====================================
 
+
+// OPEN NEW TODO
+
 function openTodoEditor() {
+
+  editingTaskIndex = null;
+
   const modal = document.getElementById("todoModal");
   const input = document.getElementById("todoName");
   const important = document.getElementById("todoImportant");
   const repeat = document.getElementById("todoRepeat");
-  const description = document.getElementById("todoImportantDescription");
-  const repeatDescription = document.getElementById("todoRepeatDescription");
-  
+
+  const description =
+    document.getElementById("todoImportantDescription");
+
+  const repeatDescription =
+    document.getElementById("todoRepeatDescription");
+
   input.value = "";
   important.checked = false;
   repeat.checked = false;
-  
+
   description.textContent =
-    currentTodoTab === "today" ?
-    "Highlight this task in Today" :
-    "Highlight this task in Weekly Todo";
-  
+    currentTodoTab === "today"
+      ? "Highlight this task in Today"
+      : "Highlight this task in Weekly Todo";
+
   repeatDescription.textContent =
-    currentTodoTab === "today" ?
-    "Repeat this task every day" :
-    "Repeat this task every week";
-  
+    currentTodoTab === "today"
+      ? "Repeat this task every day"
+      : "Repeat this task every week";
+
   modal.classList.add("open");
-  
+
   setTimeout(() => {
     input.focus();
   }, 100);
 }
 
 
-function closeTodoEditor() {
-  document.getElementById("todoModal").classList.remove("open");
-}
+// EDIT EXISTING TODO
 
+function editTask(i) {
 
-function saveTodo() {
+  const activeTasks = getActiveTasks();
+  const task = activeTasks[i];
+
+  if (!task) return;
+
+  editingTaskIndex = i;
+
+  const modal = document.getElementById("todoModal");
   const input = document.getElementById("todoName");
   const important = document.getElementById("todoImportant");
   const repeat = document.getElementById("todoRepeat");
-  
+
+  const description =
+    document.getElementById("todoImportantDescription");
+
+  const repeatDescription =
+    document.getElementById("todoRepeatDescription");
+
+  input.value = task.name;
+  important.checked = !!task.important;
+  repeat.checked = !!task.repeat;
+
+  description.textContent =
+    currentTodoTab === "today"
+      ? "Highlight this task in Today"
+      : "Highlight this task in Weekly Todo";
+
+  repeatDescription.textContent =
+    currentTodoTab === "today"
+      ? "Repeat this task every day"
+      : "Repeat this task every week";
+
+  modal.classList.add("open");
+
+  setTimeout(() => {
+    input.focus();
+  }, 100);
+}
+
+
+// CLOSE EDITOR
+
+function closeTodoEditor() {
+
+  document.getElementById("todoModal").classList.remove("open");
+
+  editingTaskIndex = null;
+}
+
+
+// SAVE TODO
+
+function saveTodo() {
+
+  const input = document.getElementById("todoName");
+  const important = document.getElementById("todoImportant");
+  const repeat = document.getElementById("todoRepeat");
+
   const name = input.value.trim();
-  
+
   if (!name) {
     input.focus();
     return;
   }
-  
-  addTask(name, important.checked, repeat.checked);
-  
+
+  // EDIT EXISTING TODO
+
+  if (editingTaskIndex !== null) {
+
+    checkWeekChange();
+
+    const activeTasks = getActiveTasks();
+    const task = activeTasks[editingTaskIndex];
+
+    if (!task) {
+      editingTaskIndex = null;
+      closeTodoEditor();
+      return;
+    }
+
+    task.name = name;
+    task.important = important.checked;
+    task.repeat = repeat.checked;
+
+    sortActiveTasks();
+
+    render();
+    saveActiveTasks();
+
+  }
+
+  // ADD NEW TODO
+
+  else {
+
+    addTask(name, important.checked, repeat.checked);
+
+  }
+
   closeTodoEditor();
 }
 
@@ -593,16 +689,21 @@ function saveTodo() {
 // IMPORTANT / REPEAT SWITCH
 
 document.getElementById("todoImportant").addEventListener("change", function() {
+
   if (this.checked) {
     document.getElementById("todoRepeat").checked = false;
   }
+
 });
 
 document.getElementById("todoRepeat").addEventListener("change", function() {
+
   if (this.checked) {
     document.getElementById("todoImportant").checked = false;
   }
+
 });
+
 
 // =====================================
 // REMOVE TASK
@@ -1675,73 +1776,143 @@ function closeArchiveIfOpen() {
 // PAGE NAVIGATION
 // =====================================
 
-// WEEKLY is the main page.
-// Swipe right from WEEKLY -> DAILY.
-// Swipe left from WEEKLY -> MONTHLY.
+// Page order
+const PAGE_CONFIGS = [
+  { id: "daily", label: "CALENDAR" },
+  { id: "weekly", label: "TODO" },
+  { id: "monthly", label: "GOALS" },
+  { id: "ideas", label: "IDEAS" }
+];
 
 let currentPage = "weekly";
 
 const weeklyPage = document.getElementById("weekly");
 const dailyPage = document.getElementById("daily");
 const monthlyPage = document.getElementById("monthly");
+const ideasPage = document.getElementById("ideas");
 
-function showPage(page) {
 
-  if (page===currentPage) return;
+// =====================================
+// RENDER PAGE INDICATOR
+// =====================================
 
+function renderPageIndicator() {
+  
+  const indicator = document.getElementById("pageIndicator");
+  
+  if (!indicator) return;
+  
+  indicator.innerHTML = "";
+  
+  PAGE_CONFIGS.forEach(config => {
+    
+    const dot = document.createElement("button");
+    
+    dot.type = "button";
+    dot.className = "page-dot";
+    dot.setAttribute("aria-label", config.label);
+    
+    dot.classList.toggle(
+      "active",
+      config.id === currentPage
+    );
+    
+    dot.addEventListener("click", () => {
+      showPage(config.id);
+    });
+    
+    indicator.appendChild(dot);
+    
+  });
+  
+}
+
+
+// =====================================
+// SHOW PAGE
+// =====================================
+
+function showPage(page, force = false) {
+  
+  if (page === currentPage && !force) {
+    renderPageIndicator();
+    return;
+  }
+  
   localStorage.setItem("plan-last-page", page);
-
-  if (page!=="monthly") {
+  
+  if (page !== "monthly") {
     closeArchiveIfOpen();
   }
-
-  if (page==="monthly") {
+  
+  if (page === "monthly") {
     saveMonthly();
   }
-
+  
   currentPage = page;
-
-  weeklyPage.style.display = page==="weekly" ? "block" : "none";
-  dailyPage.style.display = page==="daily" ? "flex" : "none";
-  monthlyPage.style.display = page==="monthly" ? "block" : "none";
-
-  if (page==="daily") {
+  
+  weeklyPage.style.display = page === "weekly" ? "block" : "none";
+  dailyPage.style.display = page === "daily" ? "flex" : "none";
+  monthlyPage.style.display = page === "monthly" ? "block" : "none";
+  ideasPage.style.display = page === "ideas" ? "block" : "none";
+  
+  if (page === "daily") {
     renderDaily();
   }
-
-  if (page==="monthly") {
+  
+  if (page === "monthly") {
     loadMonthly();
   }
-
-  if (page==="weekly") {
+  
+  if (page === "weekly") {
     checkWeekChange();
   }
-
-  document.getElementById("dotDaily").classList.toggle(
-    "active",page==="daily"
-  );
-
-  document.getElementById("dotWeekly").classList.toggle(
-    "active",page==="weekly"
-  );
-
-  document.getElementById("dotMonthly").classList.toggle(
-    "active",page==="monthly"
-  );
-
-  window.scrollTo(0,0);
-
-if (
-  page === "daily" &&
-  selectedDailyDate === dateKey(new Date())
-) {
-  requestAnimationFrame(() => {
+  
+  renderPageIndicator();
+  
+  window.scrollTo(0, 0);
+  
+  if (
+    page === "daily" &&
+    selectedDailyDate === dateKey(new Date())
+  ) {
     requestAnimationFrame(() => {
-      scrollDailyToCurrentTime();
+      requestAnimationFrame(() => {
+        scrollDailyToCurrentTime();
+      });
     });
-  });
+  }
+  
 }
-}
+
+
+// Initial dots
+renderPageIndicator();
+
+// =====================================
+// PREVENT PAGE PINCH ZOOM
+// =====================================
+
+document.addEventListener("touchmove", e => {
+  
+  if (e.touches.length < 2) return;
+  
+  const target = e.target;
+  
+  const isIdeasCanvas =
+    target.closest &&
+    target.closest(".ideas-workspace");
+  
+  // Allow pinch zoom only on Ideas canvas in Edit mode.
+  if (isIdeasCanvas && ideasEditMode) return;
+  
+  // Prevent page zoom everywhere else.
+  e.preventDefault();
+  
+}, {
+  passive: false,
+  capture: true
+});
 
 
 // =====================================
@@ -1753,105 +1924,139 @@ let swipeStartY = 0;
 let swipeDirection = null;
 let swipeTracking = false;
 
+
+// TOUCH START
+
 document.addEventListener("touchstart", e => {
-  
+
   if (e.touches.length !== 1) {
     swipeTracking = false;
+    swipeDirection = null;
     return;
   }
-  
+
   swipeStartX = e.touches[0].clientX;
   swipeStartY = e.touches[0].clientY;
-  
+
   swipeDirection = null;
   swipeTracking = true;
-  
+
 }, { passive: true });
 
 
+// TOUCH MOVE
+
 document.addEventListener("touchmove", e => {
-  
+
   if (!swipeTracking) return;
-  
+
   const touch = e.touches[0];
-  
+
   const diffX = touch.clientX - swipeStartX;
   const diffY = touch.clientY - swipeStartY;
-  
+
   const absX = Math.abs(diffX);
   const absY = Math.abs(diffY);
-  
+
   if (swipeDirection === null) {
-    
+
     if (Math.max(absX, absY) < 6) return;
-    
+
     if (absX > absY * 1.2) {
       swipeDirection = "horizontal";
     } else if (absY > absX * 1.2) {
       swipeDirection = "vertical";
     }
-    
+
   }
-  
+
   if (swipeDirection === "horizontal") {
     e.preventDefault();
   }
-  
+
 }, { passive: false });
 
+
+// TOUCH END
+
 document.addEventListener("touchend", e => {
-  
+
   if (!swipeTracking) return;
-  
+
   swipeTracking = false;
-  
+
   // Do not navigate while dragging a task.
   if (document.body.classList.contains("dragging")) return;
-  
+
   // Do not navigate while the archive is open.
   if (
     document.getElementById("archive").style.display === "block"
   ) return;
-  
+
   if (swipeDirection !== "horizontal") return;
-  
+
   const touch = e.changedTouches[0];
-  
   const diffX = touch.clientX - swipeStartX;
-  
+
   // Require a minimum horizontal movement.
   if (Math.abs(diffX) < 65) return;
-  
+
+
+  // =====================================
+  // PAGE NAVIGATION
+  // CALENDAR ⇄ TODO ⇄ GOALS ⇄ IDEAS
+  // =====================================
+
   if (currentPage === "weekly") {
-    
+
+    // Swipe left → GOALS
     if (diffX < 0) showPage("monthly");
+
+    // Swipe right → CALENDAR
     if (diffX > 0) showPage("daily");
-    
-  } else if (currentPage === "monthly") {
-    
-    if (diffX > 0) showPage("weekly");
-    
+
   } else if (currentPage === "daily") {
-    
+
+    // Swipe left → TODO
     if (diffX < 0) showPage("weekly");
-    
+
+  } else if (currentPage === "monthly") {
+
+    // Swipe right → TODO
+    if (diffX > 0) showPage("weekly");
+
+    // Swipe left → IDEAS
+    if (diffX < 0) showPage("ideas");
+
+  } else if (currentPage === "ideas") {
+
+    // Swipe right → GOALS
+    if (diffX > 0) showPage("monthly");
+
   }
-  
+
 }, { passive: true });
 
 
+// TOUCH CANCEL
+
 document.addEventListener("touchcancel", () => {
+
   swipeTracking = false;
   swipeDirection = null;
+
 }, { passive: true });
 
 // =====================================
 // START APP
 // =====================================
 
+checkWeekChange();
+checkTodayChange();
+
 render();
 renderDaily();
 
-  const lastPage = localStorage.getItem("plan-last-page") || "weekly";
+const lastPage = localStorage.getItem("plan-last-page") || "weekly";
 
-showPage(lastPage);
+showPage(lastPage, true);
