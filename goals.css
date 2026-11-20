@@ -27,14 +27,15 @@
 }
 
 .month-period {
-  color:#75d69b;
-  font-size:14px;
-  letter-spacing:1px;
+  color: #888;
+  font-size: 11px;
+  letter-spacing: normal;
+  margin-top: 8px;
 }
 
 .past-button {
   background:#222;
-  color:#aaa;
+  color:white;
   border:1px solid #444;
   border-radius:8px;
   padding:10px 14px;
