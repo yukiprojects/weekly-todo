@@ -34,126 +34,118 @@
 
 <div class="page" id="weekly">
 
-  <header>
-    <div class="brand">
-      <svg class="calendar-icon" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="1.7"
-           stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="5" width="18" height="16" rx="2"/>
-        <path d="M16 3v4M8 3v4M3 10h18"/>
-        <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/>
-      </svg>
-
-      <div>
-        <h1>TODO.</h1>
-        <div class="sub" id="period"></div>
-      </div>
+<header>
+  <div class="brand">
+    <svg class="calendar-icon" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.7"
+         stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="5" width="18" height="16" rx="2"/>
+      <path d="M16 3v4M8 3v4M3 10h18"/>
+      <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/>
+    </svg>
+    <div>
+      <h1>TODO.</h1>
+      <div class="sub" id="period"></div>
     </div>
-
-    <button
-      class="weekly-add-button"
-      onclick="openTodoEditor()"
-      aria-label="Add new todo"
-    >+</button>
-  </header>
-
-  <div class="weekdays" id="weekdays"></div>
-
-  <div class="todo-tabs">
-    <button
-      class="todo-tab active"
-      id="todayTab"
-      type="button"
-      onclick="switchTodoTab('today')"
-    >TODAY</button>
-
-    <button
-      class="todo-tab"
-      id="weekTab"
-      type="button"
-      onclick="switchTodoTab('week')"
-    >WEEK</button>
   </div>
 
-  <div id="list"></div>
+  <button
+    class="weekly-add-button"
+    onclick="openTodoEditor()"
+    aria-label="Add new todo"
+  >+</button>
+</header>
 
-  <div class="section finished-header">
-    <div class="finished-count" id="finishedCount">0/0 DONE!</div>
-  </div>
+<div class="weekdays" id="weekdays"></div>
 
-  <div id="finishedList"></div>
+<div class="todo-tabs">
+  <button
+    class="todo-tab active"
+    id="todayTab"
+    type="button"
+    onclick="switchTodoTab('today')"
+  >TODAY</button>
 
-  <!-- TODO EDITOR MODAL -->
+  <button
+    class="todo-tab"
+    id="weekTab"
+    type="button"
+    onclick="switchTodoTab('week')"
+  >WEEK</button>
+</div>
+
+<div id="list"></div>
+
+<div class="section finished-header">
+  <div class="finished-count" id="finishedCount">0/0 DONE!</div>
+</div>
+
+<div id="finishedList"></div>
+
+<!-- TODO EDITOR MODAL -->
+<div
+  class="todo-modal"
+  id="todoModal"
+  onclick="closeTodoEditor()"
+>
   <div
-    class="todo-modal"
-    id="todoModal"
-    onclick="closeTodoEditor()"
+    class="todo-editor"
+    onclick="event.stopPropagation()"
   >
-    <div
-      class="todo-editor"
-      onclick="event.stopPropagation()"
-    >
 
-      <div class="todo-editor-header">
-        <div class="todo-editor-title">NEW TODO</div>
-
-        <button
-          class="todo-close-button"
-          onclick="closeTodoEditor()"
-          aria-label="Close"
-        >×</button>
-      </div>
-
-      <div class="editor-label">TASK TITLE</div>
-
-      <input
-        id="todoName"
-        class="todo-input"
-        placeholder="What do you need to do?"
-        maxlength="100"
-      />
-
-      <div class="todo-important-row">
-        <div class="todo-important-label">
-          <div class="todo-important-title">IMPORTANT</div>
-          <div
-            class="todo-important-description"
-            id="todoImportantDescription"
-          >
-            Highlight this task in Weekly Todo
-          </div>
-        </div>
-
-        <label class="todo-switch">
-          <input type="checkbox" id="todoImportant">
-          <span class="todo-switch-slider"></span>
-        </label>
-      </div>
-
-      <div class="todo-important-row">
-        <div class="todo-important-label">
-          <div class="todo-important-title">REPEAT</div>
-          <div
-            class="todo-important-description"
-            id="todoRepeatDescription"
-          >
-            Repeat this task every day
-          </div>
-        </div>
-
-        <label class="todo-switch">
-          <input type="checkbox" id="todoRepeat">
-          <span class="todo-switch-slider"></span>
-        </label>
-      </div>
-
+    <div class="todo-editor-header">
+      <div class="todo-editor-title">NEW TODO</div>
       <button
-        class="todo-save-button"
-        onclick="saveTodo()"
-      >SAVE</button>
-
+        class="todo-close-button"
+        onclick="closeTodoEditor()"
+        aria-label="Close"
+      >×</button>
     </div>
+
+    <div class="editor-label">TASK TITLE</div>
+
+    <input
+      id="todoName"
+      class="todo-input"
+      placeholder="What do you need to do?"
+      maxlength="100"
+    />
+
+    <div class="todo-important-row">
+      <div class="todo-important-label">
+        <div class="todo-important-title">IMPORTANT</div>
+        <div class="todo-important-description" id="todoImportantDescription">
+          Highlight this task in Weekly Todo
+        </div>
+      </div>
+
+      <label class="todo-switch">
+        <input type="checkbox" id="todoImportant">
+        <span class="todo-switch-slider"></span>
+      </label>
+    </div>
+
+    <div class="todo-important-row">
+      <div class="todo-important-label">
+        <div class="todo-important-title">REPEAT</div>
+        <div class="todo-important-description" id="todoRepeatDescription">
+          Repeat this task every day
+        </div>
+      </div>
+
+      <label class="todo-switch">
+        <input type="checkbox" id="todoRepeat">
+        <span class="todo-switch-slider"></span>
+      </label>
+    </div>
+
+    <button
+      class="todo-save-button"
+      onclick="saveTodo()"
+    >SAVE</button>
+
   </div>
+</div>
 
 </div>
 
@@ -174,7 +166,6 @@
         <path d="M16 3v4M8 3v4M3 10h18"/>
         <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/>
       </svg>
-
       <h1 class="daily-title">CALENDAR.</h1>
     </div>
 
@@ -182,14 +173,12 @@
 
       <div class="date-nav">
         <button onclick="changeDailyDate(-1)">‹</button>
-
         <input
           type="date"
           id="dailyDate"
           class="daily-date"
           onchange="selectDailyDate()"
         />
-
         <button onclick="changeDailyDate(1)">›</button>
       </div>
 
@@ -223,11 +212,7 @@
         </button>
       </div>
 
-      <div
-        id="dailySettingsPanel"
-        class="daily-settings-panel"
-        style="display:none;"
-      >
+      <div id="dailySettingsPanel" class="daily-settings-panel" style="display:none;">
         <h3>DAILY SETTINGS</h3>
 
         <label for="dailyStartTime">Start time</label>
@@ -263,6 +248,7 @@
     id="eventModal"
     onclick="closeEventEditor()"
   >
+
     <div
       class="event-editor"
       id="eventEditor"
@@ -317,6 +303,7 @@
       </div>
 
     </div>
+
   </div>
 
 </div>
@@ -362,11 +349,8 @@
       <div class="month-question">
         1ヶ月後、どんな自分になっていたい？
       </div>
-      <textarea
-        class="month-textarea"
-        id="futureSelf"
-        placeholder="I want to become someone who..."
-      ></textarea>
+      <textarea class="month-textarea" id="futureSelf"
+        placeholder="I want to become someone who..."></textarea>
     </div>
 
     <div class="month-section">
@@ -374,11 +358,8 @@
       <div class="month-question">
         1ヶ月後、何ができるようになっていたい？
       </div>
-      <textarea
-        class="month-textarea"
-        id="newSkills"
-        placeholder="I want to be able to..."
-      ></textarea>
+      <textarea class="month-textarea" id="newSkills"
+        placeholder="I want to be able to..."></textarea>
     </div>
 
     <div class="month-section">
@@ -386,11 +367,8 @@
       <div class="month-question">
         今月、達成したいことは？
       </div>
-      <textarea
-        class="month-textarea"
-        id="monthlyGoals"
-        placeholder="My goals this month..."
-      ></textarea>
+      <textarea class="month-textarea" id="monthlyGoals"
+        placeholder="My goals this month..."></textarea>
     </div>
 
     <div class="month-section">
@@ -398,11 +376,8 @@
       <div class="month-question">
         今の自分から変えたいことは？
       </div>
-      <textarea
-        class="month-textarea"
-        id="oneThing"
-        placeholder="One thing I want to change..."
-      ></textarea>
+      <textarea class="month-textarea" id="oneThing"
+        placeholder="One thing I want to change..."></textarea>
     </div>
 
     <div class="month-footer">
@@ -419,7 +394,6 @@
 
     <div class="archive-header">
       <h2 class="archive-title">PAST MONTHS</h2>
-
       <button class="archive-close" onclick="closeArchive()">
         CLOSE ×
       </button>
@@ -440,55 +414,34 @@
      PAGE : IDEAS
 ===================================== -->
 
+
 <div class="page" id="ideas">
-
   <header>
-
     <div class="brand">
-  <h1>IDEAS.</h1>
-  <div id="ideasEditingLabel">EDITING...</div>
-</div>
-
-    <div class="ideas-header-actions">
-
-      <button
-        id="addIdeaButton"
-        aria-label="Add idea"
-      >+</button>
-
-      <button
-        id="ideasEditButton"
-        type="button"
-      >Edit</button>
-
+      <h1>IDEAS.</h1>
     </div>
 
+    <div class="ideas-header-actions">
+      <span id="ideasEditingLabel">EDITING...</span>
+      <button id="addIdeaButton">＋</button>
+      <button id="ideasEditButton">Edit</button>
+    </div>
   </header>
 
   <div id="ideasCanvas"></div>
-
 </div>
+
 
 
 <!-- =====================================
      PAGE INDICATOR
 ===================================== -->
 
-<div class="page-indicator" id="pageIndicator">
-  <span id="dotDaily" class="page-dot"></span>
-  <span id="dotWeekly" class="page-dot active"></span>
-  <span id="dotMonthly" class="page-dot"></span>
-  <span id="dotIdeas" class="page-dot"></span>
-</div>
+<div id="pageIndicator" class="page-indicator"></div>
 
 </div>
-
-<!-- =====================================
-     SCRIPTS
-===================================== -->
 
 <script src="./ideas.js"></script>
 <script src="./script.js"></script>
-
 </body>
 </html>
