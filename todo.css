@@ -110,9 +110,9 @@ header {
 }
 
 .todo-tab.active {
-  color:#75d69b;
-  background:#1b1b1b;
-  border-color:#75d69b;
+  color: #111;
+  background: #75d69b;
+  border-color: #75d69b;
 }
 
 /* TASK */
