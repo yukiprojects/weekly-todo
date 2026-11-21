@@ -1854,7 +1854,7 @@ function showPage(page, force = false) {
   weeklyPage.style.display = page === "weekly" ? "block" : "none";
   dailyPage.style.display = page === "daily" ? "flex" : "none";
   monthlyPage.style.display = page === "monthly" ? "block" : "none";
-  ideasPage.style.display = page === "ideas" ? "block" : "none";
+  ideasPage.style.display = page === "ideas" ? "flex" : "none";
   
   if (page === "daily") {
     renderDaily();
