@@ -578,3 +578,23 @@
   line-height: 1.8;
   max-width: 260px;
 }
+
+/* =====================================
+   EDITING LABEL - FIXED POSITION
+===================================== */
+
+#ideasEditingLabel {
+  display: flex;
+  justify-content: center;
+}
+
+#ideasEditingLabel .editing-text {
+  flex: none;
+}
+
+#ideasEditingLabel .editing-dots {
+  display: inline-block;
+  width: 3ch;
+  text-align: left;
+  flex: none;
+}
