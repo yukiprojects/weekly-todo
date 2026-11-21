@@ -961,52 +961,21 @@ function getDailyEvents() {
 
 const HOUR_HEIGHT = 72;
 
-  // Current time position on screen (30%)
+// Current time position on screen (30%)
 const DAILY_TIME_SCROLL_POSITION = 0.30;
 
-function getDailySettings() {
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem("plan-daily-settings") || "null"
-    );
-
-    return {
-      startTime: saved?.startTime || "05:00",
-      endTime: saved?.endTime || "02:00"
-    };
-  } catch (e) {
-    return {
-      startTime: "05:00",
-      endTime: "02:00"
-    };
-  }
-}
-
-function timeToOffset(time) {
-  const [hour, minute] = time.split(":").map(Number);
-  return hour * 60 + minute - 300;
-}
+// Fixed display range: 00:00 – 00:00 next day
+const DAILY_START = -300;
+const DAILY_END = 1140;
+const TOTAL_HOURS = 24;
 
 function getDailyTimeRange() {
-  const settings = getDailySettings();
-
-  const start = timeToOffset(settings.startTime);
-  let end = timeToOffset(settings.endTime);
-
-  while (end <= start) {
-    end += 1440;
-  }
-
   return {
-    start,
-    end,
-    hours: (end - start) / 60
+    start: DAILY_START,
+    end: DAILY_END,
+    hours: TOTAL_HOURS
   };
 }
-
-const DAILY_START = getDailyTimeRange().start;
-const DAILY_END = getDailyTimeRange().end;
-const TOTAL_HOURS = getDailyTimeRange().hours;
 
 function formatDailyTime(offset) {
   const total = 300 + Number(offset);
@@ -1054,7 +1023,6 @@ function buildTimeOptions() {
 }
 
 buildTimeOptions();
-
 
 
 // =====================================
@@ -1176,10 +1144,6 @@ function scrollDailyToCurrentTime() {
 
   let nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-  if (nowMinutes < 300) {
-    nowMinutes += 1440;
-  }
-
   const currentOffset = nowMinutes - 300;
 
   const range = getDailyTimeRange();
@@ -1253,101 +1217,6 @@ function updateDailyDateStyle() {
 }
 
 
-
-
-
-// =====================================
-// DAILY SETTINGS
-// =====================================
-
-function openDailySettings() {
-  const panel = document.getElementById("dailySettingsPanel");
-
-  // Toggle panel
-  if (panel.style.display === "block") {
-    closeDailySettings();
-    return;
-  }
-
-  populateDailyTimeSettings();
-
-  const saved = getDailySettings();
-
-  document.getElementById("dailyStartTime").value =
-    saved.startTime;
-
-  document.getElementById("dailyEndTime").value =
-    saved.endTime;
-
-  // Center panel on screen
-  panel.style.position = "fixed";
-  panel.style.top = "50%";
-  panel.style.left = "50%";
-  panel.style.transform = "translate(-50%, -50%)";
-  panel.style.width = "calc(100vw - 40px)";
-  panel.style.maxWidth = "420px";
-  panel.style.maxHeight = "80vh";
-  panel.style.overflowY = "auto";
-  panel.style.zIndex = "9999";
-  panel.style.margin = "0";
-
-  panel.style.display = "block";
-}
-
-function closeDailySettings() {
-  const panel = document.getElementById("dailySettingsPanel");
-  panel.style.display = "none";
-}
-
-function populateDailyTimeSettings() {
-  const startSelect = document.getElementById("dailyStartTime");
-  const endSelect = document.getElementById("dailyEndTime");
-
-  startSelect.innerHTML = "";
-  endSelect.innerHTML = "";
-
-  // Start time: 00:00–23:00
-  for (let hour = 0; hour < 24; hour++) {
-    const value = String(hour).padStart(2, "0") + ":00";
-
-    startSelect.add(new Option(value, value));
-  }
-
-  // End time: 00:00–27:00
-  for (let hour = 0; hour <= 27; hour++) {
-    const value = String(hour).padStart(2, "0") + ":00";
-
-    let label = value;
-
-    if (hour >= 24) {
-      const nextDayHour = hour - 24;
-
-      label =
-        String(nextDayHour).padStart(2, "0") +
-        ":00 (+1 day)";
-    }
-
-    endSelect.add(new Option(label, value));
-  }
-}
-
-function saveDailySettings() {
-  const startTime =
-    document.getElementById("dailyStartTime").value;
-
-  const endTime =
-    document.getElementById("dailyEndTime").value;
-
-  localStorage.setItem(
-    "plan-daily-settings",
-    JSON.stringify({
-      startTime,
-      endTime
-    })
-  );
-
-  location.reload();
-}
 
 
 
