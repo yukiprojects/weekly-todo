@@ -1,16 +1,20 @@
 
+
 /* =====================================
    IDEAS PAGE
 ===================================== */
 
 #ideas {
-  display: none;
+  height: calc(100dvh - 76px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: 0;
+  flex-direction: column;
 }
 
 #ideasCanvas {
   position: relative;
   width: 100%;
-  height: calc(100vh - 150px);
+  flex: 1;
+  min-height: 0;
   margin-top: 15px;
   overflow: hidden;
   display: flex;
