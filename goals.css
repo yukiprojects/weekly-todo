@@ -53,8 +53,9 @@
 }
 
 .month-question {
-  font-size:16px;
-  margin-bottom:12px;
+  color: white;
+  font-size: 14px;
+  margin-bottom: 12px;
 }
 
 .month-textarea {
@@ -78,12 +79,8 @@
 }
 
 .month-textarea:focus {
-  outline:none;
-  border-color:#75d69b;
-}
-
-.month-textarea.filled {
-  border-color:#75d69b;
+  outline: none;
+  border-color: #75d69b;
 }
 
 .month-textarea::placeholder {
