@@ -1,4 +1,41 @@
 
+// =====================================
+// EDITING DOTS ANIMATION
+// =====================================
+
+let ideasEditingTimer = null;
+
+function startIdeasEditingAnimation(label) {
+  
+  if (ideasEditingTimer) {
+    clearInterval(ideasEditingTimer);
+  }
+  
+  label.innerHTML = `
+    <span class="editing-text">EDITING</span><span class="editing-dots"></span>
+  `;
+  
+  let dots = 0;
+  
+  ideasEditingTimer = setInterval(() => {
+    
+    dots = (dots + 1) % 4;
+    
+    label.querySelector(".editing-dots").textContent =
+      ".".repeat(dots);
+    
+  }, 450);
+}
+
+function stopIdeasEditingAnimation(label) {
+  if (ideasEditingTimer) {
+    clearInterval(ideasEditingTimer);
+    ideasEditingTimer = null;
+  }
+  
+  label.textContent = "EDITING";
+}
+
 /* =====================================
    IDEAS
 ===================================== */
@@ -181,8 +218,14 @@ if (editButton) {
     }
     
     if (editingLabel) {
-      editingLabel.style.display = ideasEditMode ? "block" : "none";
-    }
+  editingLabel.style.display = ideasEditMode ? "block" : "none";
+  
+  if (ideasEditMode) {
+    startIdeasEditingAnimation(editingLabel);
+  } else {
+    stopIdeasEditingAnimation(editingLabel);
+  }
+}
     
     updateIdeasGuide();
     
