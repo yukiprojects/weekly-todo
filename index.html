@@ -182,48 +182,7 @@
         <button onclick="changeDailyDate(1)">›</button>
       </div>
 
-      <div class="daily-actions">
-        <button
-          class="daily-settings-button"
-          onclick="openDailySettings()"
-          aria-label="Daily settings"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 2.8v2"/>
-            <path d="M12 19.2v2"/>
-            <path d="M21.2 12h-2"/>
-            <path d="M4.8 12h-2"/>
-            <path d="m18.5 5.5-1.4 1.4"/>
-            <path d="m6.9 17.1-1.4 1.4"/>
-            <path d="m18.5 18.5-1.4-1.4"/>
-            <path d="M6.9 6.9 5.5 5.5"/>
-            <circle cx="12" cy="12" r="7"/>
-            <circle cx="12" cy="12" r="2.5"/>
-          </svg>
-        </button>
-      </div>
-
-      <div id="dailySettingsPanel" class="daily-settings-panel" style="display:none;">
-        <h3>DAILY SETTINGS</h3>
-
-        <label for="dailyStartTime">Start time</label>
-        <select id="dailyStartTime"></select>
-
-        <label for="dailyEndTime">End time</label>
-        <select id="dailyEndTime"></select>
-
-        <button onclick="saveDailySettings()">SAVE</button>
-        <button onclick="closeDailySettings()">CANCEL</button>
-      </div>
+      
 
     </div>
 
@@ -255,7 +214,7 @@
       onclick="event.stopPropagation()"
     >
 
-      <div class="editor-title" id="editorTitle">NEW EVENT</div>
+      <div class="editor-title" id="editorTitle"></div>
 
       <div class="editor-label">EVENT TITLE</div>
 
@@ -278,10 +237,6 @@
           <select id="eventEnd" class="event-select"></select>
         </div>
 
-      </div>
-
-      <div class="event-editor-hint">
-        Schedule range: 05:00 – 02:00 next day.
       </div>
 
       <div class="editor-actions">
